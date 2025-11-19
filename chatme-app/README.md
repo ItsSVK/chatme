@@ -1,97 +1,184 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# ChatMe - React Native Frontend
 
-# Getting Started
+Anonymous random chat app built with React Native and WebSocket.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- 🔒 **Anonymous**: No registration required
+- ⚡ **Real-time**: Instant message delivery via WebSocket
+- 🌍 **Random Matching**: Queue-based algorithm pairs users randomly
+- 🔄 **Skip Partner**: Find new chat partners with "Next" button
+- 📱 **Cross-platform**: Works on iOS and Android
+- 🎨 **Modern UI**: Beautiful animations and smooth transitions
+- 🔌 **Auto-reconnect**: Handles network issues gracefully
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Prerequisites
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- Node.js >= 20
+- React Native development environment setup
+- iOS: Xcode and CocoaPods
+- Android: Android Studio and Java SDK
 
-```sh
-# Using npm
-npm start
+## Installation
 
-# OR using Yarn
-yarn start
+```bash
+npm install
+
+# iOS only
+cd ios && pod install && cd ..
 ```
 
-## Step 2: Build and run your app
+## Configuration
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Update WebSocket URL in `src/config/index.ts`:
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```typescript
+WEBSOCKET_URL: 'wss://your-backend-url.workers.dev'
 ```
+
+## Running
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+```bash
 npm run ios
-
-# OR using Yarn
-yarn ios
+# or
+npx react-native run-ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Android
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```bash
+npm run android
+# or
+npx react-native run-android
+```
 
-## Step 3: Modify your app
+## Project Structure
 
-Now that you have successfully run the app, let's make changes!
+```
+src/
+├── screens/          # Screen components
+│   ├── SplashScreen.tsx
+│   ├── HomeScreen.tsx
+│   └── ChatScreen.tsx
+├── hooks/            # Custom React hooks
+│   └── useChatWebSocket.ts
+├── types/            # TypeScript types
+│   ├── index.ts
+│   └── websocket.ts
+├── config/           # App configuration
+│   └── index.ts
+├── constants/        # Colors, theme, etc.
+├── assets/           # Images and resources
+└── components/       # Reusable components
+```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## WebSocket Integration
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+The app uses a custom `useChatWebSocket` hook that manages:
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+- WebSocket connection lifecycle
+- Message sending/receiving
+- Connection state management
+- Auto-reconnection logic
+- Keep-alive pings
 
-## Congratulations! :tada:
+### Usage Example
 
-You've successfully run and modified your React Native App. :partying_face:
+```typescript
+import { useChatWebSocket } from '../hooks/useChatWebSocket';
 
-### Now what?
+function ChatScreen() {
+  const {
+    connectionState,
+    messages,
+    sendMessage,
+    startSearch,
+    endChat,
+    partnerId,
+    disconnect,
+  } = useChatWebSocket();
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+  // Connection states: 'disconnected' | 'connecting' | 'connected' | 'searching' | 'matched' | 'error'
+}
+```
 
-# Troubleshooting
+## Testing
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### Unit Tests
 
-# Learn More
+```bash
+npm test
+```
 
-To learn more about React Native, take a look at the following resources:
+### E2E Testing (Manual)
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+1. Run app on two devices/simulators
+2. Click "Start Chatting" on both
+3. Verify matching occurs
+4. Send messages from both sides
+5. Test "Next" and "End Chat" buttons
+
+## Troubleshooting
+
+### Metro Bundler Issues
+
+```bash
+npx react-native start --reset-cache
+```
+
+### iOS Build Issues
+
+```bash
+cd ios
+pod deintegrate
+pod install
+cd ..
+```
+
+### Android Build Issues
+
+```bash
+cd android
+./gradlew clean
+cd ..
+```
+
+### WebSocket Not Connecting
+
+- Verify backend is deployed and accessible
+- Check WebSocket URL in `src/config/index.ts`
+- For Android local testing, use IP address instead of `localhost`
+- Check network permissions in AndroidManifest.xml
+
+## Scripts
+
+- `npm run android` - Run on Android
+- `npm run ios` - Run on iOS
+- `npm start` - Start Metro bundler
+- `npm test` - Run tests
+- `npm run lint` - Lint code
+
+## Dependencies
+
+### Core
+- React 19.1.1
+- React Native 0.82.1
+- react-native-safe-area-context
+
+### Dev Dependencies
+- TypeScript
+- ESLint
+- Jest
+- Babel
+
+## License
+
+MIT
+
+## Support
+
+For setup and integration help, see:
+- `../QUICK_START.md` - Quick setup guide
+- `../INTEGRATION_GUIDE.md` - Detailed integration guide

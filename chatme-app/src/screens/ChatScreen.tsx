@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StatusBar,
@@ -17,7 +16,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Theme } from '../constants';
 import type { ChatScreenProps } from '../types';
+import { useChatWebSocket } from '../hooks/useChatWebSocket';
 
+/**
+ * Message interface for chat messages
+ */
 interface Message {
   id: string;
   text: string;
@@ -29,123 +32,16 @@ interface Message {
  * ChatScreen Component
  * Redesigned to match modern chat interface with profile header and message bubbles
  */
-// Face emojis list
-const FACE_EMOJIS = [
-  '😊',
-  '😃',
-  '😄',
-  '😁',
-  '😆',
-  '😅',
-  '🤣',
-  '😂',
-  '🙂',
-  '🙃',
-  '😉',
-  '😌',
-  '😍',
-  '🥰',
-  '😘',
-  '😗',
-  '😙',
-  '😚',
-  '😋',
-  '😛',
-  '😝',
-  '😜',
-  '🤪',
-  '🤨',
-  '🧐',
-  '🤓',
-  '😎',
-  '🤩',
-  '🥳',
-  '😏',
-  '😒',
-  '😞',
-  '😔',
-  '😟',
-  '😕',
-  '🙁',
-  '☹️',
-  '😣',
-  '😖',
-  '😫',
-  '😩',
-  '🥺',
-  '😢',
-  '😭',
-  '😤',
-  '😠',
-  '😡',
-  '🤬',
-  '🤯',
-  '😳',
-  '🥵',
-  '🥶',
-  '😱',
-  '😨',
-  '😰',
-  '😥',
-  '😓',
-  '🤗',
-  '🤔',
-  '🤭',
-  '🤫',
-  '🤥',
-  '😶',
-  '😐',
-  '😑',
-  '😬',
-  '🙄',
-  '😯',
-  '😦',
-  '😧',
-  '😮',
-  '😲',
-  '🥱',
-  '😴',
-  '🤤',
-  '😪',
-  '😵',
-  '🤐',
-  '🥴',
-  '🤢',
-  '🤮',
-  '🤧',
-  '😷',
-  '🤒',
-  '🤕',
-  '🤑',
-  '🤠',
-  '😈',
-  '👿',
-  '💀',
-  '☠️',
-  '💩',
-  '🤡',
-  '👹',
-  '👺',
-  '👻',
-  '👽',
-  '👾',
-  '🤖',
-  '😺',
-  '😸',
-  '😹',
-  '😻',
-  '😼',
-  '😽',
-  '🙀',
-  '😿',
-  '😾',
-];
+
+const FLIRTING_EMOJIS = ['😊', '🥰', '😘', '😉', '😍', '🙂', '😳', '😋'];
+
+const GAMING_EMOJIS = ['😂', '🤣', '😎', '🤨', '🤯', '🤡', '😏', '🤖'];
+
+const EMOTION_EMOJIS = ['😭', '🥺', '😢', '😩', '😠', '😔', '😥', '😰'];
 
 export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [isConnecting, setIsConnecting] = useState(true);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
@@ -157,9 +53,34 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
   const dot3Anim = useRef(new Animated.Value(0.3)).current;
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Generate a random contact name for demo
-  const contactName = 'Anonymous User';
-  const contactStatus = 'Typing...';
+  // WebSocket hook for real-time chat
+  const {
+    connectionState,
+    messages,
+    sendMessage: sendWebSocketMessage,
+    startSearch,
+    endChat: endWebSocketChat,
+    partnerId,
+    disconnect,
+    clearMessages,
+  } = useChatWebSocket();
+
+  // Determine if we're connecting/searching
+  const isConnecting =
+    connectionState === 'connecting' || connectionState === 'searching';
+
+  // Generate contact name and status based on connection state
+  const contactName = partnerId
+    ? `Anonymous ${partnerId.substring(0, 8)}`
+    : 'Anonymous User';
+  const contactStatus =
+    connectionState === 'searching'
+      ? 'Finding a stranger...'
+      : connectionState === 'matched'
+      ? 'Online'
+      : connectionState === 'connecting'
+      ? 'Connecting...'
+      : 'Offline';
 
   useEffect(() => {
     // Entrance animation
@@ -228,6 +149,17 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
     };
   }, [keyboardHeightAnim]);
 
+  // Start search when component mounts
+  useEffect(() => {
+    console.log('[ChatScreen] Starting search on mount');
+    startSearch();
+
+    return () => {
+      // Cleanup: disconnect when unmounting
+      console.log('[ChatScreen] Component unmounting, disconnecting');
+    };
+  }, [startSearch]);
+
   // Loading dots animation for connecting state
   useEffect(() => {
     if (isConnecting) {
@@ -259,28 +191,25 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
 
       animation.start();
 
-      // Simulate connection after 2-3 seconds
-      const connectionTimer = setTimeout(() => {
-        setIsConnecting(false);
-        animation.stop();
-      }, 2500);
-
       return () => {
         animation.stop();
-        clearTimeout(connectionTimer);
       };
     }
   }, [isConnecting, dot1Anim, dot2Anim, dot3Anim]);
 
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages]);
+
   const handleSend = () => {
-    if (message.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: message.trim(),
-        isUser: true,
-        timestamp: new Date(),
-      };
-      setMessages([...messages, newMessage]);
+    if (message.trim() && connectionState === 'matched') {
+      // Send message through WebSocket
+      sendWebSocketMessage(message.trim());
       setMessage('');
 
       // Animate input
@@ -296,20 +225,21 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
           useNativeDriver: true,
         }),
       ]).start();
-
-      // Scroll to bottom
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
     }
   };
 
   const handleNextChat = () => {
-    setMessages([]);
     setMessage('');
-    setIsConnecting(true);
+    clearMessages();
     setShowEmojiPicker(false);
-    onNextChat();
+    // End current chat and search for new partner
+    endWebSocketChat();
+  };
+
+  const handleEndChatButton = () => {
+    // Disconnect and go back to home screen
+    disconnect();
+    onEndChat();
   };
 
   const toggleEmojiPicker = () => {
@@ -336,7 +266,21 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
   };
 
   const handleEmojiSelect = (emoji: string) => {
-    setMessage(prev => prev + emoji);
+    // Send emoji directly as quick reaction if connected and matched
+    if (connectionState === 'matched') {
+      sendWebSocketMessage(emoji);
+      // Close emoji picker after sending
+      setShowEmojiPicker(false);
+      Animated.spring(emojiPickerAnim, {
+        toValue: 0,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      // If not matched, fall back to adding to text input
+      setMessage(prev => prev + emoji);
+    }
   };
 
   const formatTime = (date: Date) => {
@@ -455,11 +399,6 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
                 {isConnecting ? (
                   <>
                     <View style={styles.emptyStateIconContainer}>
-                      {/* <Image
-                        source={require('../assets/chatme_avatar.png')}
-                        style={styles.emptyStateIcon}
-                        resizeMode="contain"
-                      /> */}
                       <Text style={styles.searchIcon}>🔍</Text>
                     </View>
                     <Text style={styles.emptyStateText}>
@@ -584,13 +523,7 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
               ]}
             >
               <View style={styles.emojiPickerHeader}>
-                <Text style={styles.emojiPickerTitle}>Face Emojis</Text>
-                <TouchableOpacity
-                  onPress={toggleEmojiPicker}
-                  style={styles.emojiPickerCloseButton}
-                >
-                  <Text style={styles.emojiPickerCloseText}>✕</Text>
-                </TouchableOpacity>
+                <Text style={styles.emojiPickerTitle}>Quick Emojis</Text>
               </View>
               <ScrollView
                 style={styles.emojiPickerScroll}
@@ -598,16 +531,56 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
               >
-                {FACE_EMOJIS.map((emoji, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.emojiItem}
-                    onPress={() => handleEmojiSelect(emoji)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.emojiItemText}>{emoji}</Text>
-                  </TouchableOpacity>
-                ))}
+                {/* Flirting Emojis Section */}
+                <View style={styles.emojiSection}>
+                  <Text style={styles.emojiSectionTitle}>Flirting</Text>
+                  <View style={styles.emojiSectionGrid}>
+                    {FLIRTING_EMOJIS.map((emoji, index) => (
+                      <TouchableOpacity
+                        key={`flirting-${index}`}
+                        style={styles.emojiItem}
+                        onPress={() => handleEmojiSelect(emoji)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.emojiItemText}>{emoji}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                {/* Gaming Emojis Section */}
+                <View style={styles.emojiSection}>
+                  <Text style={styles.emojiSectionTitle}>Gaming</Text>
+                  <View style={styles.emojiSectionGrid}>
+                    {GAMING_EMOJIS.map((emoji, index) => (
+                      <TouchableOpacity
+                        key={`gaming-${index}`}
+                        style={styles.emojiItem}
+                        onPress={() => handleEmojiSelect(emoji)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.emojiItemText}>{emoji}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                {/* Emotion Emojis Section */}
+                <View style={styles.emojiSection}>
+                  <Text style={styles.emojiSectionTitle}>Emotions</Text>
+                  <View style={styles.emojiSectionGrid}>
+                    {EMOTION_EMOJIS.map((emoji, index) => (
+                      <TouchableOpacity
+                        key={`emotion-${index}`}
+                        style={styles.emojiItem}
+                        onPress={() => handleEmojiSelect(emoji)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.emojiItemText}>{emoji}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
               </ScrollView>
             </Animated.View>
           )}
@@ -642,21 +615,29 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
 
             <TextInput
               style={styles.input}
-              placeholder="Hey..."
+              placeholder={
+                connectionState === 'matched'
+                  ? 'Hey...'
+                  : connectionState === 'searching'
+                  ? 'Searching...'
+                  : 'Connecting...'
+              }
               placeholderTextColor={Colors.textGray}
               value={message}
               onChangeText={setMessage}
               multiline
               maxLength={500}
+              editable={connectionState === 'matched'}
             />
 
             <TouchableOpacity
               style={[
                 styles.sendButton,
-                !message.trim() && styles.sendButtonDisabled,
+                (!message.trim() || connectionState !== 'matched') &&
+                  styles.sendButtonDisabled,
               ]}
               onPress={handleSend}
-              disabled={!message.trim()}
+              disabled={!message.trim() || connectionState !== 'matched'}
               activeOpacity={0.7}
             >
               <Text style={styles.sendIcon}>➤</Text>
@@ -668,7 +649,7 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
             <View style={styles.bottomActions}>
               <TouchableOpacity
                 style={styles.bottomActionButton}
-                onPress={onEndChat}
+                onPress={handleEndChatButton}
                 activeOpacity={0.7}
               >
                 <Text style={styles.bottomActionText}>End Chat</Text>
@@ -677,6 +658,7 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
                 style={[styles.bottomActionButton, styles.nextActionButton]}
                 onPress={handleNextChat}
                 activeOpacity={0.7}
+                disabled={connectionState !== 'matched'}
               >
                 <Text style={styles.bottomActionText}>Next</Text>
               </TouchableOpacity>
@@ -924,9 +906,24 @@ const styles = StyleSheet.create({
     maxHeight: 250,
   },
   emojiPickerContent: {
+    padding: Theme.spacing.sm,
+    paddingBottom: Theme.spacing.md,
+  },
+  emojiSection: {
+    marginBottom: Theme.spacing.md,
+  },
+  emojiSectionTitle: {
+    fontSize: Theme.fontSize.sm,
+    fontWeight: Theme.fontWeight.semibold,
+    color: Colors.textGray,
+    marginBottom: Theme.spacing.xs,
+    paddingHorizontal: Theme.spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  emojiSectionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: Theme.spacing.sm,
   },
   emojiItem: {
     width: '12.5%',

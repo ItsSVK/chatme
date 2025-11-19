@@ -20,3 +20,6 @@ export interface NavigationProps {
   // Add navigation props here when you add navigation
 }
 
+// Re-export WebSocket types
+export * from './websocket';
+

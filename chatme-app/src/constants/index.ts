@@ -1,8 +1,6 @@
 /**
- * Constants barrel export
- * Export all constants from a single entry point
+ * Constants exports
  */
 
-export * from './colors';
-export * from './theme';
-
+export { Colors } from './colors';
+export { Theme } from './theme';
