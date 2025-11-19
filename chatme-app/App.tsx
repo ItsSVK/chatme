@@ -1,45 +1,44 @@
+import React, { useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SplashScreen, HomeScreen, ChatScreen } from './src/screens';
+
+type Screen = 'splash' | 'home' | 'chat';
+
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
+ * Root App Component
+ * Manages the initial app state and screen transitions
  */
-
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
+
+  const handleSplashFinish = () => {
+    setCurrentScreen('home');
+  };
+
+  const handleStartChat = () => {
+    setCurrentScreen('chat');
+  };
+
+  const handleEndChat = () => {
+    setCurrentScreen('home');
+  };
+
+  const handleNextChat = () => {
+    // Reset chat screen (you can add logic here to find a new chat partner)
+    setCurrentScreen('chat');
+  };
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      {currentScreen === 'splash' && (
+        <SplashScreen onFinish={handleSplashFinish} />
+      )}
+      {currentScreen === 'chat' && (
+        <ChatScreen onEndChat={handleEndChat} onNextChat={handleNextChat} />
+      )}
+      {currentScreen === 'home' && <HomeScreen onStartChat={handleStartChat} />}
     </SafeAreaProvider>
   );
 }
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;
