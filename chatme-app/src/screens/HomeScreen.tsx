@@ -242,5 +242,6 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: Theme.fontSize.xl,
     fontWeight: Theme.fontWeight.bold,
+    marginBottom: Theme.spacing.xs,
   },
 });

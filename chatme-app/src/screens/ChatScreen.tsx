@@ -1,43 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
   Animated,
   Easing,
-  Platform,
-  ScrollView,
   StatusBar,
   Keyboard,
-  Image,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Theme } from '../constants';
+import { Colors } from '../constants';
 import type { ChatScreenProps } from '../types';
 import { useChatWebSocket } from '../hooks/useChatWebSocket';
-
-/**
- * Message interface for chat messages
- */
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
+import {
+  ChatHeader,
+  MessageList,
+  EmojiPicker,
+  ChatInput,
+  ChatActions,
+} from '../components';
 
 /**
  * ChatScreen Component
  * Redesigned to match modern chat interface with profile header and message bubbles
  */
-
-const FLIRTING_EMOJIS = ['😊', '🥰', '😘', '😉', '😍', '🙂', '😳', '😋'];
-
-const GAMING_EMOJIS = ['😂', '🤣', '😎', '🤨', '🤯', '🤡', '😏', '🤖'];
-
-const EMOTION_EMOJIS = ['😭', '🥺', '😢', '😩', '😠', '😔', '😥', '😰'];
 
 export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
   const [message, setMessage] = useState('');
@@ -48,9 +34,6 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
   const inputScaleAnim = useRef(new Animated.Value(1)).current;
   const keyboardHeightAnim = useRef(new Animated.Value(0)).current;
   const emojiPickerAnim = useRef(new Animated.Value(0)).current;
-  const dot1Anim = useRef(new Animated.Value(0.3)).current;
-  const dot2Anim = useRef(new Animated.Value(0.3)).current;
-  const dot3Anim = useRef(new Animated.Value(0.3)).current;
   const scrollViewRef = useRef<ScrollView>(null);
 
   // WebSocket hook for real-time chat
@@ -160,43 +143,6 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
     };
   }, [startSearch]);
 
-  // Loading dots animation for connecting state
-  useEffect(() => {
-    if (isConnecting) {
-      const createPulse = (anim: Animated.Value, delay: number) => {
-        return Animated.loop(
-          Animated.sequence([
-            Animated.delay(delay),
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: 600,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: true,
-            }),
-            Animated.timing(anim, {
-              toValue: 0.3,
-              duration: 600,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: true,
-            }),
-          ]),
-        );
-      };
-
-      const animation = Animated.parallel([
-        createPulse(dot1Anim, 0),
-        createPulse(dot2Anim, 200),
-        createPulse(dot3Anim, 400),
-      ]);
-
-      animation.start();
-
-      return () => {
-        animation.stop();
-      };
-    }
-  }, [isConnecting, dot1Anim, dot2Anim, dot3Anim]);
-
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 0) {
@@ -283,67 +229,6 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
     }
   };
 
-  const formatTime = (date: Date) => {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours % 12 || 12;
-    const displayMinutes = minutes.toString().padStart(2, '0');
-    return `${displayHours}:${displayMinutes} ${ampm}`;
-  };
-
-  const formatDate = (date: Date) => {
-    const today = new Date();
-    const messageDate = new Date(date);
-    const isToday =
-      messageDate.getDate() === today.getDate() &&
-      messageDate.getMonth() === today.getMonth() &&
-      messageDate.getFullYear() === today.getFullYear();
-
-    if (isToday) {
-      const months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ];
-      return `Today, ${
-        months[messageDate.getMonth()]
-      } ${messageDate.getDate()}`;
-    }
-    return null;
-  };
-
-  const shouldShowDate = (currentMsg: Message, previousMsg: Message | null) => {
-    if (!previousMsg) return true;
-    const currentDate = new Date(currentMsg.timestamp);
-    const previousDate = new Date(previousMsg.timestamp);
-    return (
-      currentDate.getDate() !== previousDate.getDate() ||
-      currentDate.getMonth() !== previousDate.getMonth() ||
-      currentDate.getFullYear() !== previousDate.getFullYear()
-    );
-  };
-
-  const shouldShowTimestamp = (
-    currentMsg: Message,
-    nextMsg: Message | null,
-  ) => {
-    if (!nextMsg) return true;
-    const currentDate = new Date(currentMsg.timestamp);
-    const nextDate = new Date(nextMsg.timestamp);
-    const timeDiff = Math.abs(nextDate.getTime() - currentDate.getTime());
-    return timeDiff > 5 * 60 * 1000 || currentMsg.isUser !== nextMsg.isUser;
-  };
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
@@ -365,305 +250,41 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
           ]}
         >
           {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.headerCenter}>
-              <View style={styles.avatarContainer}>
-                <View style={styles.avatar}>
-                  {/* <Text style={styles.avatarText}>
-                    {contactName.charAt(0).toUpperCase()}
-                  </Text> */}
-                  <Image
-                    source={require('../assets/chatme_avatar.png')}
-                    style={styles.avatar}
-                    resizeMode="contain"
-                  />
-                </View>
-              </View>
-              <View style={styles.headerInfo}>
-                <Text style={styles.contactName}>{contactName}</Text>
-                <Text style={styles.contactStatus}>{contactStatus}</Text>
-              </View>
-            </View>
-          </View>
+          <ChatHeader contactName={contactName} contactStatus={contactStatus} />
 
           {/* Messages Area */}
-          <ScrollView
-            ref={scrollViewRef}
-            style={styles.messagesContainer}
-            contentContainerStyle={styles.messagesContent}
-            showsVerticalScrollIndicator={false}
-            keyboardDismissMode="interactive"
-          >
-            {messages.length === 0 ? (
-              <View style={styles.emptyState}>
-                {isConnecting ? (
-                  <>
-                    <View style={styles.emptyStateIconContainer}>
-                      <Text style={styles.searchIcon}>🔍</Text>
-                    </View>
-                    <Text style={styles.emptyStateText}>
-                      Connecting to a random stranger
-                    </Text>
-                    <View style={styles.loadingDotsContainer}>
-                      <Animated.View
-                        style={[
-                          styles.loadingDot,
-                          {
-                            opacity: dot1Anim,
-                            transform: [{ scale: dot1Anim }],
-                          },
-                        ]}
-                      />
-                      <Animated.View
-                        style={[
-                          styles.loadingDot,
-                          {
-                            opacity: dot2Anim,
-                            transform: [{ scale: dot2Anim }],
-                          },
-                        ]}
-                      />
-                      <Animated.View
-                        style={[
-                          styles.loadingDot,
-                          {
-                            opacity: dot3Anim,
-                            transform: [{ scale: dot3Anim }],
-                          },
-                        ]}
-                      />
-                    </View>
-                  </>
-                ) : (
-                  <>
-                    <View style={styles.emptyStateIconContainer}>
-                      <Image
-                        source={require('../assets/chatme.png')}
-                        style={styles.emptyStateIcon}
-                        resizeMode="contain"
-                      />
-                    </View>
-                    <Text style={styles.emptyStateText}>
-                      Connected! Start chatting...
-                    </Text>
-                    <Text style={styles.emptyStateSubtext}>
-                      Your messages will appear here
-                    </Text>
-                  </>
-                )}
-              </View>
-            ) : (
-              messages.map((msg, index) => {
-                const previousMsg = index > 0 ? messages[index - 1] : null;
-                const nextMsg =
-                  index < messages.length - 1 ? messages[index + 1] : null;
-                const showDate = shouldShowDate(msg, previousMsg);
-                const showTimestamp = shouldShowTimestamp(msg, nextMsg);
-
-                return (
-                  <View key={msg.id}>
-                    {showDate && (
-                      <View style={styles.dateSeparator}>
-                        <Text style={styles.dateText}>
-                          {formatDate(msg.timestamp)}
-                        </Text>
-                      </View>
-                    )}
-                    <View
-                      style={[
-                        styles.messageWrapper,
-                        msg.isUser && styles.messageWrapperRight,
-                      ]}
-                    >
-                      <View
-                        style={[
-                          styles.messageBubble,
-                          msg.isUser ? styles.userMessage : styles.otherMessage,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.messageText,
-                            msg.isUser
-                              ? styles.userMessageText
-                              : styles.otherMessageText,
-                          ]}
-                        >
-                          {msg.text}
-                        </Text>
-                      </View>
-                      {showTimestamp && (
-                        <Text style={styles.timestamp}>
-                          {formatTime(msg.timestamp)}
-                        </Text>
-                      )}
-                    </View>
-                  </View>
-                );
-              })
-            )}
-          </ScrollView>
+          <MessageList
+            messages={messages}
+            isConnecting={isConnecting}
+            scrollViewRef={scrollViewRef as React.RefObject<ScrollView>}
+          />
 
           {/* Emoji Picker */}
-          {showEmojiPicker && (
-            <Animated.View
-              style={[
-                styles.emojiPickerContainer,
-                {
-                  opacity: emojiPickerAnim,
-                  transform: [
-                    {
-                      translateY: emojiPickerAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [100, 0],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            >
-              <View style={styles.emojiPickerHeader}>
-                <Text style={styles.emojiPickerTitle}>Quick Emojis</Text>
-              </View>
-              <ScrollView
-                style={styles.emojiPickerScroll}
-                contentContainerStyle={styles.emojiPickerContent}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-              >
-                {/* Flirting Emojis Section */}
-                <View style={styles.emojiSection}>
-                  <Text style={styles.emojiSectionTitle}>Flirting</Text>
-                  <View style={styles.emojiSectionGrid}>
-                    {FLIRTING_EMOJIS.map((emoji, index) => (
-                      <TouchableOpacity
-                        key={`flirting-${index}`}
-                        style={styles.emojiItem}
-                        onPress={() => handleEmojiSelect(emoji)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.emojiItemText}>{emoji}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Gaming Emojis Section */}
-                <View style={styles.emojiSection}>
-                  <Text style={styles.emojiSectionTitle}>Gaming</Text>
-                  <View style={styles.emojiSectionGrid}>
-                    {GAMING_EMOJIS.map((emoji, index) => (
-                      <TouchableOpacity
-                        key={`gaming-${index}`}
-                        style={styles.emojiItem}
-                        onPress={() => handleEmojiSelect(emoji)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.emojiItemText}>{emoji}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Emotion Emojis Section */}
-                <View style={styles.emojiSection}>
-                  <Text style={styles.emojiSectionTitle}>Emotions</Text>
-                  <View style={styles.emojiSectionGrid}>
-                    {EMOTION_EMOJIS.map((emoji, index) => (
-                      <TouchableOpacity
-                        key={`emotion-${index}`}
-                        style={styles.emojiItem}
-                        onPress={() => handleEmojiSelect(emoji)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.emojiItemText}>{emoji}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              </ScrollView>
-            </Animated.View>
-          )}
+          <EmojiPicker
+            visible={showEmojiPicker}
+            onSelect={handleEmojiSelect}
+            animationValue={emojiPickerAnim}
+          />
 
           {/* Input Area */}
-          <Animated.View
-            style={[
-              styles.inputContainer,
-              {
-                transform: [{ scale: inputScaleAnim }],
-              },
-            ]}
-          >
-            <TouchableOpacity
-              style={[
-                styles.inputIcon,
-                showEmojiPicker && styles.inputIconActive,
-              ]}
-              onPress={toggleEmojiPicker}
-              activeOpacity={0.7}
-              disabled={isConnecting}
-            >
-              <Text
-                style={[
-                  styles.iconText,
-                  isConnecting && styles.iconTextDisabled,
-                ]}
-              >
-                😊
-              </Text>
-            </TouchableOpacity>
-
-            <TextInput
-              style={styles.input}
-              placeholder={
-                connectionState === 'matched'
-                  ? 'Hey...'
-                  : connectionState === 'searching'
-                  ? 'Searching...'
-                  : 'Connecting...'
-              }
-              placeholderTextColor={Colors.textGray}
-              value={message}
-              onChangeText={setMessage}
-              multiline
-              maxLength={500}
-              editable={connectionState === 'matched'}
-            />
-
-            <TouchableOpacity
-              style={[
-                styles.sendButton,
-                (!message.trim() || connectionState !== 'matched') &&
-                  styles.sendButtonDisabled,
-              ]}
-              onPress={handleSend}
-              disabled={!message.trim() || connectionState !== 'matched'}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.sendIcon}>➤</Text>
-            </TouchableOpacity>
-          </Animated.View>
+          <ChatInput
+            message={message}
+            onChangeText={setMessage}
+            onSend={handleSend}
+            onToggleEmojiPicker={toggleEmojiPicker}
+            showEmojiPicker={showEmojiPicker}
+            connectionState={connectionState}
+            isConnecting={isConnecting}
+            inputScaleAnim={inputScaleAnim}
+          />
 
           {/* Action buttons at bottom - hide when keyboard is visible */}
-          {keyboardHeight === 0 && (
-            <View style={styles.bottomActions}>
-              <TouchableOpacity
-                style={styles.bottomActionButton}
-                onPress={handleEndChatButton}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.bottomActionText}>End Chat</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.bottomActionButton, styles.nextActionButton]}
-                onPress={handleNextChat}
-                activeOpacity={0.7}
-                disabled={connectionState !== 'matched'}
-              >
-                <Text style={styles.bottomActionText}>Next</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <ChatActions
+            onEndChat={handleEndChatButton}
+            onNextChat={handleNextChat}
+            connectionState={connectionState}
+            visible={keyboardHeight === 0}
+          />
         </Animated.View>
       </Animated.View>
     </SafeAreaView>
@@ -680,312 +301,5 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-  },
-  header: {
-    backgroundColor: Colors.white,
-    paddingVertical: Theme.spacing.md,
-    paddingHorizontal: Theme.spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-    ...Theme.shadow.small,
-  },
-  backButton: {
-    padding: Theme.spacing.xs,
-    marginRight: Theme.spacing.sm,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: Colors.textDark,
-    fontWeight: Theme.fontWeight.bold,
-  },
-  headerCenter: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatarContainer: {
-    marginRight: Theme.spacing.sm,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    fontSize: Theme.fontSize.lg,
-    fontWeight: Theme.fontWeight.bold,
-    color: Colors.white,
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  contactName: {
-    fontSize: Theme.fontSize.md,
-    fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
-    marginBottom: 2,
-  },
-  contactStatus: {
-    fontSize: Theme.fontSize.sm,
-    color: Colors.textGray,
-    fontStyle: 'italic',
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  actionButton: {
-    padding: Theme.spacing.xs,
-    marginLeft: Theme.spacing.sm,
-  },
-  actionIcon: {
-    fontSize: 24,
-  },
-  messagesContainer: {
-    flex: 1,
-    backgroundColor: Colors.backgroundLight,
-  },
-  messagesContent: {
-    padding: Theme.spacing.md,
-    paddingBottom: Theme.spacing.lg,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: Theme.spacing.xxl,
-  },
-  emptyStateIconContainer: {
-    marginBottom: Theme.spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyStateIcon: {
-    width: 90,
-    height: 90,
-  },
-  searchIcon: {
-    fontSize: 64,
-    color: Colors.textDark,
-  },
-  emptyStateText: {
-    fontSize: Theme.fontSize.lg,
-    fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
-    marginBottom: Theme.spacing.md,
-  },
-  emptyStateSubtext: {
-    fontSize: Theme.fontSize.sm,
-    color: Colors.textGray,
-    marginTop: Theme.spacing.xs,
-  },
-  loadingDotsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: Theme.spacing.md,
-  },
-  loadingDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.primary,
-    marginHorizontal: Theme.spacing.xs,
-  },
-  dateSeparator: {
-    alignItems: 'center',
-    marginVertical: Theme.spacing.md,
-  },
-  dateText: {
-    fontSize: Theme.fontSize.sm,
-    color: Colors.textGray,
-    fontWeight: Theme.fontWeight.medium,
-  },
-  messageWrapper: {
-    marginBottom: Theme.spacing.xs,
-    maxWidth: '75%',
-  },
-  messageWrapperRight: {
-    alignSelf: 'flex-end',
-    alignItems: 'flex-end',
-  },
-  messageBubble: {
-    paddingVertical: Theme.spacing.sm,
-    paddingHorizontal: Theme.spacing.md,
-    borderRadius: 18,
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-  },
-  userMessage: {
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-  },
-  otherMessage: {
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-  },
-  messageText: {
-    fontSize: Theme.fontSize.md,
-    lineHeight: 20,
-    color: Colors.textDark,
-  },
-  userMessageText: {
-    color: Colors.textDark,
-  },
-  otherMessageText: {
-    color: Colors.textDark,
-  },
-  timestamp: {
-    fontSize: 11,
-    color: Colors.textGray,
-    marginTop: 4,
-    marginHorizontal: Theme.spacing.xs,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    backgroundColor: Colors.white,
-    paddingVertical: Theme.spacing.sm,
-    paddingHorizontal: Theme.spacing.sm,
-    paddingBottom: Platform.OS === 'ios' ? Theme.spacing.sm : Theme.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
-    alignItems: 'center',
-  },
-  inputIcon: {
-    padding: Theme.spacing.xs,
-    marginHorizontal: Theme.spacing.xs,
-  },
-  inputIconActive: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: Theme.borderRadius.md,
-  },
-  iconText: {
-    fontSize: 24,
-  },
-  iconTextDisabled: {
-    opacity: 0.5,
-  },
-  emojiPickerContainer: {
-    backgroundColor: Colors.white,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
-    maxHeight: 300,
-    ...Theme.shadow.medium,
-  },
-  emojiPickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Theme.spacing.md,
-    paddingVertical: Theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-  },
-  emojiPickerTitle: {
-    fontSize: Theme.fontSize.md,
-    fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
-  },
-  emojiPickerCloseButton: {
-    padding: Theme.spacing.xs,
-  },
-  emojiPickerCloseText: {
-    fontSize: 20,
-    color: Colors.textGray,
-    fontWeight: Theme.fontWeight.bold,
-  },
-  emojiPickerScroll: {
-    maxHeight: 250,
-  },
-  emojiPickerContent: {
-    padding: Theme.spacing.sm,
-    paddingBottom: Theme.spacing.md,
-  },
-  emojiSection: {
-    marginBottom: Theme.spacing.md,
-  },
-  emojiSectionTitle: {
-    fontSize: Theme.fontSize.sm,
-    fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textGray,
-    marginBottom: Theme.spacing.xs,
-    paddingHorizontal: Theme.spacing.xs,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  emojiSectionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  emojiItem: {
-    width: '12.5%',
-    aspectRatio: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: Theme.spacing.xs,
-  },
-  emojiItemText: {
-    fontSize: 28,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 20,
-    paddingVertical: Theme.spacing.sm,
-    paddingHorizontal: Theme.spacing.md,
-    fontSize: Theme.fontSize.md,
-    color: Colors.textDark,
-    maxHeight: 100,
-    marginHorizontal: Theme.spacing.xs,
-  },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: Theme.spacing.xs,
-  },
-  sendButtonDisabled: {
-    backgroundColor: Colors.textGray,
-    opacity: 0.5,
-  },
-  sendIcon: {
-    fontSize: 16,
-    color: Colors.white,
-    fontWeight: Theme.fontWeight.bold,
-  },
-  bottomActions: {
-    flexDirection: 'row',
-    paddingHorizontal: Theme.spacing.md,
-    paddingVertical: Theme.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
-    backgroundColor: Colors.white,
-  },
-  bottomActionButton: {
-    flex: 1,
-    paddingVertical: Theme.spacing.sm,
-    borderRadius: Theme.borderRadius.md,
-    backgroundColor: '#FEE2E2',
-    alignItems: 'center',
-    marginHorizontal: Theme.spacing.xs,
-  },
-  nextActionButton: {
-    backgroundColor: '#DBEAFE',
-  },
-  bottomActionText: {
-    fontSize: Theme.fontSize.sm,
-    fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
   },
 });
