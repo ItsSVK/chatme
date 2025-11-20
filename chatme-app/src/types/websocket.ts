@@ -3,22 +3,21 @@
  * These types match the backend protocol defined in chatme-backend/src/types.ts
  */
 
-import {
-  END_CHAT,
-  PING,
-  SEARCH,
-  MESSAGE,
-  SESSION_ID,
-  MATCHED,
-  SEARCHING,
-  PONG,
-  PARTNER_DISCONNECTED,
-  CHAT_ENDED,
-  DISCONNECTED,
-  CONNECTING,
-  CONNECTED,
-  ERROR,
-} from './enums';
+type SEARCH = 'search';
+type MESSAGE = 'message';
+type END_CHAT = 'end_chat';
+type PING = 'ping';
+type SESSION_ID = 'session_id';
+type PARTNER_DISCONNECTED = 'partner_disconnected';
+type PONG = 'pong';
+type CHAT_ENDED = 'chat_ended';
+
+type DISCONNECTED = 'disconnected';
+type CONNECTING = 'connecting';
+type CONNECTED = 'connected';
+type SEARCHING = 'searching';
+type MATCHED = 'matched';
+type ERROR = 'error';
 
 // Client → Server message types
 export interface ClientMessage {

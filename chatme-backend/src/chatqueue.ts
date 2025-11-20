@@ -377,7 +377,7 @@ export class ChatQueue extends DurableObject<Env> {
 
 		const connection = this.connections.get(sessionId);
 		if (!connection || !connection.currentPartnerId) {
-			ws.send(JSON.stringify({ type: 'error', message: 'Not connected to anyone' }));
+			ws.send(JSON.stringify({ type: 'partner_disconnected' }));
 			return; // Not connected to anyone
 		}
 
@@ -385,7 +385,7 @@ export class ChatQueue extends DurableObject<Env> {
 		if (!partnerConnection) {
 			// Partner disconnected, clean up
 			connection.currentPartnerId = null;
-			ws.send(JSON.stringify({ type: 'error', message: 'Partner disconnected' }));
+			ws.send(JSON.stringify({ type: 'partner_disconnected' }));
 			return;
 		}
 
