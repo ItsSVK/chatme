@@ -20,7 +20,7 @@ export const Config = {
   // When running locally with `wrangler dev`, it's typically http://localhost:8787
   // Make sure to use ws:// for local and wss:// for production
   WEBSOCKET_URL:
-    __DEV__ && true
+    __DEV__ && false
       ? 'ws://localhost:8787' // Local development (set to true when testing locally)
       : //   ? 'ws://192.168.29.70:8787' // Local development (set to true when testing locally)
         // ⚠️ For physical device: This may not work! See PHYSICAL_DEVICE_SETUP.md
@@ -28,7 +28,7 @@ export const Config = {
         // 1. Android: Use "adb reverse tcp:8787 tcp:8787" then 'ws://localhost:8787'
         // 2. iOS: Use ngrok URL (wss://xxx.ngrok.io) or deploy to Cloudflare
         // 3. Network: Ensure same Wi-Fi, check firewall, verify IP with ifconfig/ipconfig
-        'wss://chatme-backend.shouvikmohanta.workers.dev', // Production (update with your actual deployed URL)
+        'wss://chatme-backend.connectshouvik.workers.dev', // Production (update with your actual deployed URL)
 
   // Reconnection settings
   RECONNECT_INTERVAL: 3000, // 3 seconds
