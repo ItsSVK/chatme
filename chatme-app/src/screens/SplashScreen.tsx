@@ -9,7 +9,9 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
+import { useTheme } from '../contexts/ThemeContext';
 import type { SplashScreenProps } from '../types';
 
 /**
@@ -17,6 +19,9 @@ import type { SplashScreenProps } from '../types';
  * Displays animated splash screen with logo and branding
  */
 export default function SplashScreen({ onFinish }: SplashScreenProps) {
+  const Colors = useThemedColors();
+  const { theme } = useTheme();
+  const styles = createStyles(Colors);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -201,7 +206,7 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
   return (
     <SafeAreaView style={styles.splashContainer} edges={['top']}>
       <StatusBar
-        barStyle="light-content"
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={Colors.background}
         translucent
       />
@@ -338,7 +343,7 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   splashContainer: {
     flex: 1,
     justifyContent: 'center',

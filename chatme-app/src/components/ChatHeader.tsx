@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
 
 interface ChatHeaderProps {
   contactName: string;
@@ -16,36 +17,39 @@ export default function ChatHeader({
   contactName,
   contactStatus,
 }: ChatHeaderProps) {
+  const Colors = useThemedColors();
+  const dynamicStyles = createStyles(Colors);
+  
   return (
-    <View style={styles.header}>
-      <View style={styles.headerCenter}>
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatar}>
+    <View style={dynamicStyles.header}>
+        <View style={dynamicStyles.headerCenter}>
+        <View style={dynamicStyles.avatarContainer}>
+          <View style={dynamicStyles.avatar}>
             <Image
               source={require('../assets/chatme_avatar.png')}
-              style={styles.avatar}
+              style={dynamicStyles.avatar}
               resizeMode="contain"
             />
           </View>
         </View>
-        <View style={styles.headerInfo}>
-          <Text style={styles.contactName}>{contactName}</Text>
-          <Text style={styles.contactStatus}>{contactStatus}</Text>
+        <View style={dynamicStyles.headerInfo}>
+          <Text style={dynamicStyles.contactName}>{contactName}</Text>
+          <Text style={dynamicStyles.contactStatus}>{contactStatus}</Text>
         </View>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   header: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     paddingVertical: Theme.spacing.md,
     paddingHorizontal: Theme.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+    borderBottomColor: Colors.glassBorder,
     ...Theme.shadow.small,
   },
   headerCenter: {
@@ -70,12 +74,12 @@ const styles = StyleSheet.create({
   contactName: {
     fontSize: Theme.fontSize.md,
     fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
+    color: Colors.text,
     marginBottom: 2,
   },
   contactStatus: {
     fontSize: Theme.fontSize.sm,
-    color: Colors.textGray,
+    color: Colors.textSecondary,
     fontStyle: 'italic',
   },
 });

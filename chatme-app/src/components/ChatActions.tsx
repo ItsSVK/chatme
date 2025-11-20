@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
 import type { ConnectionState } from '../types/websocket';
 
 interface ChatActionsProps {
@@ -21,53 +22,59 @@ export default function ChatActions({
   connectionState,
   visible,
 }: ChatActionsProps) {
+  const Colors = useThemedColors();
+  const dynamicStyles = createStyles(Colors);
+  
   if (!visible) return null;
 
   return (
-    <View style={styles.container}>
+    <View style={dynamicStyles.container}>
       <TouchableOpacity
-        style={styles.button}
+        style={dynamicStyles.button}
         onPress={onEndChat}
         activeOpacity={0.7}
       >
-        <Text style={styles.buttonText}>End Chat</Text>
+        <Text style={dynamicStyles.buttonText}>End Chat</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.button, styles.nextButton]}
+        style={[dynamicStyles.button, dynamicStyles.nextButton]}
         onPress={onNextChat}
         activeOpacity={0.7}
         disabled={connectionState !== 'matched'}
       >
-        <Text style={styles.buttonText}>Next</Text>
+        <Text style={dynamicStyles.buttonText}>Next</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
-    backgroundColor: Colors.white,
+    borderTopColor: Colors.glassBorder,
+    backgroundColor: Colors.background,
   },
   button: {
     flex: 1,
     paddingVertical: Theme.spacing.sm,
     borderRadius: Theme.borderRadius.md,
-    backgroundColor: '#FEE2E2',
+    backgroundColor: 'rgba(236, 72, 153, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
     alignItems: 'center',
     marginHorizontal: Theme.spacing.xs,
   },
   nextButton: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+    borderColor: 'rgba(99, 102, 241, 0.3)',
   },
   buttonText: {
     fontSize: Theme.fontSize.sm,
     fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
+    color: Colors.text,
   },
 });
 

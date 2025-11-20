@@ -13,7 +13,8 @@ import {
   Animated,
   Platform,
 } from 'react-native';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
 import type { ConnectionState } from '../types/websocket';
 
 interface ChatInputProps {
@@ -37,6 +38,9 @@ export default function ChatInput({
   isConnecting,
   inputScaleAnim,
 }: ChatInputProps) {
+  const Colors = useThemedColors();
+  const dynamicStyles = createStyles(Colors);
+  
   const placeholder =
     connectionState === 'matched'
       ? 'Hey...'
@@ -49,7 +53,7 @@ export default function ChatInput({
   return (
     <Animated.View
       style={[
-        styles.container,
+        dynamicStyles.container,
         {
           transform: [{ scale: inputScaleAnim }],
         },
@@ -57,24 +61,24 @@ export default function ChatInput({
     >
       <TouchableOpacity
         style={[
-          styles.emojiButton,
-          showEmojiPicker && styles.emojiButtonActive,
+          dynamicStyles.emojiButton,
+          showEmojiPicker && dynamicStyles.emojiButtonActive,
         ]}
         onPress={onToggleEmojiPicker}
         activeOpacity={0.7}
         disabled={isConnecting}
       >
         <Text
-          style={[styles.emojiIcon, isConnecting && styles.emojiIconDisabled]}
+          style={[dynamicStyles.emojiIcon, isConnecting && dynamicStyles.emojiIconDisabled]}
         >
           😊
         </Text>
       </TouchableOpacity>
 
       <TextInput
-        style={styles.input}
+        style={dynamicStyles.input}
         placeholder={placeholder}
-        placeholderTextColor={Colors.textGray}
+        placeholderTextColor={Colors.textSecondary}
         value={message}
         onChangeText={onChangeText}
         multiline
@@ -83,26 +87,26 @@ export default function ChatInput({
       />
 
       <TouchableOpacity
-        style={[styles.sendButton, !canSend && styles.sendButtonDisabled]}
+        style={[dynamicStyles.sendButton, !canSend && dynamicStyles.sendButtonDisabled]}
         onPress={onSend}
         disabled={!canSend}
         activeOpacity={0.7}
       >
-        <Text style={styles.sendIcon}>➤</Text>
+        <Text style={dynamicStyles.sendIcon}>➤</Text>
       </TouchableOpacity>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     paddingVertical: Theme.spacing.sm,
     paddingHorizontal: Theme.spacing.sm,
     paddingBottom: Platform.OS === 'ios' ? Theme.spacing.sm : Theme.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
+    borderTopColor: Colors.glassBorder,
     alignItems: 'center',
   },
   emojiButton: {
@@ -110,7 +114,7 @@ const styles = StyleSheet.create({
     marginHorizontal: Theme.spacing.xs,
   },
   emojiButtonActive: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: Colors.glassBackground,
     borderRadius: Theme.borderRadius.md,
   },
   emojiIcon: {
@@ -121,12 +125,12 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: Colors.glassBackground,
     borderRadius: 20,
     paddingVertical: Theme.spacing.sm,
     paddingHorizontal: Theme.spacing.md,
     fontSize: Theme.fontSize.md,
-    color: Colors.textDark,
+    color: Colors.text,
     maxHeight: 100,
     marginHorizontal: Theme.spacing.xs,
   },
@@ -134,13 +138,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: Theme.spacing.xs,
   },
   sendButtonDisabled: {
-    backgroundColor: Colors.textGray,
+    backgroundColor: Colors.textSecondary,
     opacity: 0.5,
   },
   sendIcon: {

@@ -10,4 +10,5 @@ export { default as MessageList } from './MessageList';
 export { default as EmojiPicker } from './EmojiPicker';
 export { default as ChatInput } from './ChatInput';
 export { default as ChatActions } from './ChatActions';
+export { default as ThemeToggle } from './ThemeToggle';
 

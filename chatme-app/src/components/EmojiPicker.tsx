@@ -12,7 +12,8 @@ import {
   StyleSheet,
   Animated,
 } from 'react-native';
-import { Colors, Theme, FLIRTING_EMOJIS, GAMING_EMOJIS, EMOTION_EMOJIS } from '../constants';
+import { Theme, FLIRTING_EMOJIS, GAMING_EMOJIS, EMOTION_EMOJIS } from '../constants';
+import { useThemedColors } from '../hooks';
 
 interface EmojiPickerProps {
   visible: boolean;
@@ -25,12 +26,15 @@ export default function EmojiPicker({
   onSelect,
   animationValue,
 }: EmojiPickerProps) {
+  const Colors = useThemedColors();
+  const dynamicStyles = createStyles(Colors);
+  
   if (!visible) return null;
 
   return (
     <Animated.View
       style={[
-        styles.container,
+        dynamicStyles.container,
         {
           opacity: animationValue,
           transform: [
@@ -44,61 +48,61 @@ export default function EmojiPicker({
         },
       ]}
     >
-      <View style={styles.header}>
-        <Text style={styles.title}>Quick Emojis</Text>
+      <View style={dynamicStyles.header}>
+        <Text style={dynamicStyles.title}>Quick Emojis</Text>
       </View>
       <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.content}
+        style={dynamicStyles.scroll}
+        contentContainerStyle={dynamicStyles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
         {/* Flirting Emojis Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Flirting</Text>
-          <View style={styles.grid}>
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Flirting</Text>
+          <View style={dynamicStyles.grid}>
             {FLIRTING_EMOJIS.map((emoji, index) => (
               <TouchableOpacity
                 key={`flirting-${index}`}
-                style={styles.emojiItem}
+                style={dynamicStyles.emojiItem}
                 onPress={() => onSelect(emoji)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.emojiText}>{emoji}</Text>
+                <Text style={dynamicStyles.emojiText}>{emoji}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         {/* Gaming Emojis Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gaming</Text>
-          <View style={styles.grid}>
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Gaming</Text>
+          <View style={dynamicStyles.grid}>
             {GAMING_EMOJIS.map((emoji, index) => (
               <TouchableOpacity
                 key={`gaming-${index}`}
-                style={styles.emojiItem}
+                style={dynamicStyles.emojiItem}
                 onPress={() => onSelect(emoji)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.emojiText}>{emoji}</Text>
+                <Text style={dynamicStyles.emojiText}>{emoji}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         {/* Emotion Emojis Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Emotions</Text>
-          <View style={styles.grid}>
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Emotions</Text>
+          <View style={dynamicStyles.grid}>
             {EMOTION_EMOJIS.map((emoji, index) => (
               <TouchableOpacity
                 key={`emotion-${index}`}
-                style={styles.emojiItem}
+                style={dynamicStyles.emojiItem}
                 onPress={() => onSelect(emoji)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.emojiText}>{emoji}</Text>
+                <Text style={dynamicStyles.emojiText}>{emoji}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -108,11 +112,11 @@ export default function EmojiPicker({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   container: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
+    borderTopColor: Colors.glassBorder,
     maxHeight: 300,
     ...Theme.shadow.medium,
   },
@@ -123,12 +127,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+    borderBottomColor: Colors.glassBorder,
   },
   title: {
     fontSize: Theme.fontSize.md,
     fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
+    color: Colors.text,
   },
   scroll: {
     maxHeight: 250,
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Theme.fontSize.sm,
     fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textGray,
+    color: Colors.textSecondary,
     marginBottom: Theme.spacing.xs,
     paddingHorizontal: Theme.spacing.xs,
     textTransform: 'uppercase',

@@ -5,7 +5,8 @@
 
 import React, { RefObject } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
 import type { Message } from '../types';
 import { formatDate, shouldShowDate, shouldShowTimestamp } from '../utils';
 import MessageBubble from './MessageBubble';
@@ -22,39 +23,42 @@ export default function MessageList({
   isConnecting,
   scrollViewRef,
 }: MessageListProps) {
+  const Colors = useThemedColors();
+  const dynamicStyles = createStyles(Colors);
+  
   return (
     <ScrollView
       ref={scrollViewRef}
-      style={styles.messagesContainer}
-      contentContainerStyle={styles.messagesContent}
+      style={dynamicStyles.messagesContainer}
+      contentContainerStyle={dynamicStyles.messagesContent}
       showsVerticalScrollIndicator={false}
       keyboardDismissMode="interactive"
     >
       {messages.length === 0 ? (
-        <View style={styles.emptyState}>
+        <View style={dynamicStyles.emptyState}>
           {isConnecting ? (
             <>
-              <View style={styles.emptyStateIconContainer}>
-                <Text style={styles.searchIcon}>🔍</Text>
+              <View style={dynamicStyles.emptyStateIconContainer}>
+                <Text style={dynamicStyles.searchIcon}>🔍</Text>
               </View>
-              <Text style={styles.emptyStateText}>
+              <Text style={dynamicStyles.emptyStateText}>
                 Connecting to a random stranger
               </Text>
               <LoadingDots isAnimating={isConnecting} />
             </>
           ) : (
             <>
-              <View style={styles.emptyStateIconContainer}>
+              <View style={dynamicStyles.emptyStateIconContainer}>
                 <Image
                   source={require('../assets/chatme.png')}
-                  style={styles.emptyStateIcon}
+                  style={dynamicStyles.emptyStateIcon}
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.emptyStateText}>
+              <Text style={dynamicStyles.emptyStateText}>
                 Connected! Start chatting...
               </Text>
-              <Text style={styles.emptyStateSubtext}>
+              <Text style={dynamicStyles.emptyStateSubtext}>
                 Your messages will appear here
               </Text>
             </>
@@ -84,10 +88,10 @@ export default function MessageList({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   messagesContainer: {
     flex: 1,
-    backgroundColor: Colors.backgroundLight,
+    backgroundColor: Colors.background,
   },
   messagesContent: {
     padding: Theme.spacing.md,
@@ -110,17 +114,17 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     fontSize: 64,
-    color: Colors.textDark,
+    color: Colors.text,
   },
   emptyStateText: {
     fontSize: Theme.fontSize.lg,
     fontWeight: Theme.fontWeight.semibold,
-    color: Colors.textDark,
+    color: Colors.text,
     marginBottom: Theme.spacing.md,
   },
   emptyStateSubtext: {
     fontSize: Theme.fontSize.sm,
-    color: Colors.textGray,
+    color: Colors.textSecondary,
     marginTop: Theme.spacing.xs,
   },
 });

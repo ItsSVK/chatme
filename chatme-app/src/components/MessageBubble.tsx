@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
 import type { Message } from '../types';
 import { formatTime } from '../utils';
 
@@ -22,38 +23,41 @@ export default function MessageBubble({
   showDate,
   dateText,
 }: MessageBubbleProps) {
+  const Colors = useThemedColors();
+  const dynamicStyles = createStyles(Colors);
+  
   return (
     <View>
       {showDate && dateText && (
-        <View style={styles.dateSeparator}>
-          <Text style={styles.dateText}>{dateText}</Text>
+        <View style={dynamicStyles.dateSeparator}>
+          <Text style={dynamicStyles.dateText}>{dateText}</Text>
         </View>
       )}
       <View
         style={[
-          styles.messageWrapper,
-          message.isUser && styles.messageWrapperRight,
+          dynamicStyles.messageWrapper,
+          message.isUser && dynamicStyles.messageWrapperRight,
         ]}
       >
         <View
           style={[
-            styles.messageBubble,
-            message.isUser ? styles.userMessage : styles.otherMessage,
+            dynamicStyles.messageBubble,
+            message.isUser ? dynamicStyles.userMessage : dynamicStyles.otherMessage,
           ]}
         >
           <Text
             style={[
-              styles.messageText,
+              dynamicStyles.messageText,
               message.isUser
-                ? styles.userMessageText
-                : styles.otherMessageText,
+                ? dynamicStyles.userMessageText
+                : dynamicStyles.otherMessageText,
             ]}
           >
             {message.text}
           </Text>
         </View>
         {showTimestamp && (
-          <Text style={styles.timestamp}>
+          <Text style={dynamicStyles.timestamp}>
             {formatTime(message.timestamp)}
           </Text>
         )}
@@ -62,14 +66,14 @@ export default function MessageBubble({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   dateSeparator: {
     alignItems: 'center',
     marginVertical: Theme.spacing.md,
   },
   dateText: {
     fontSize: Theme.fontSize.sm,
-    color: Colors.textGray,
+    color: Colors.textSecondary,
     fontWeight: Theme.fontWeight.medium,
   },
   messageWrapper: {
@@ -84,34 +88,34 @@ const styles = StyleSheet.create({
     paddingVertical: Theme.spacing.sm,
     paddingHorizontal: Theme.spacing.md,
     borderRadius: 18,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.glassBackground,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: Colors.glassBorder,
   },
   userMessage: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.primary,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: Colors.primaryLight,
   },
   otherMessage: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.glassBackground,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: Colors.glassBorder,
   },
   messageText: {
     fontSize: Theme.fontSize.md,
     lineHeight: 20,
-    color: Colors.textDark,
+    color: Colors.text,
   },
   userMessageText: {
-    color: Colors.textDark,
+    color: Colors.white,
   },
   otherMessageText: {
-    color: Colors.textDark,
+    color: Colors.text,
   },
   timestamp: {
     fontSize: 11,
-    color: Colors.textGray,
+    color: Colors.textSecondary,
     marginTop: 4,
     marginHorizontal: Theme.spacing.xs,
   },

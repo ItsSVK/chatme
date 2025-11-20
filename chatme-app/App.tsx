@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 import { SplashScreen, HomeScreen, ChatScreen } from './src/screens';
 
 type Screen = 'splash' | 'home' | 'chat';
@@ -29,15 +30,17 @@ function App() {
   };
 
   return (
-    <SafeAreaProvider>
-      {currentScreen === 'splash' && (
-        <SplashScreen onFinish={handleSplashFinish} />
-      )}
-      {currentScreen === 'chat' && (
-        <ChatScreen onEndChat={handleEndChat} onNextChat={handleNextChat} />
-      )}
-      {currentScreen === 'home' && <HomeScreen onStartChat={handleStartChat} />}
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
+        {currentScreen === 'splash' && (
+          <SplashScreen onFinish={handleSplashFinish} />
+        )}
+        {currentScreen === 'chat' && (
+          <ChatScreen onEndChat={handleEndChat} onNextChat={handleNextChat} />
+        )}
+        {currentScreen === 'home' && <HomeScreen onStartChat={handleStartChat} />}
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }
 

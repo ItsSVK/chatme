@@ -5,13 +5,16 @@
 
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Easing } from 'react-native';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
 
 interface LoadingDotsProps {
   isAnimating?: boolean;
 }
 
 export default function LoadingDots({ isAnimating = true }: LoadingDotsProps) {
+  const Colors = useThemedColors();
+  const dynamicStyles = createStyles(Colors);
   const dot1Anim = useRef(new Animated.Value(0.3)).current;
   const dot2Anim = useRef(new Animated.Value(0.3)).current;
   const dot3Anim = useRef(new Animated.Value(0.3)).current;
@@ -53,10 +56,10 @@ export default function LoadingDots({ isAnimating = true }: LoadingDotsProps) {
   }, [isAnimating, dot1Anim, dot2Anim, dot3Anim]);
 
   return (
-    <View style={styles.container}>
+    <View style={dynamicStyles.container}>
       <Animated.View
         style={[
-          styles.dot,
+          dynamicStyles.dot,
           {
             opacity: dot1Anim,
             transform: [{ scale: dot1Anim }],
@@ -65,7 +68,7 @@ export default function LoadingDots({ isAnimating = true }: LoadingDotsProps) {
       />
       <Animated.View
         style={[
-          styles.dot,
+          dynamicStyles.dot,
           {
             opacity: dot2Anim,
             transform: [{ scale: dot2Anim }],
@@ -74,7 +77,7 @@ export default function LoadingDots({ isAnimating = true }: LoadingDotsProps) {
       />
       <Animated.View
         style={[
-          styles.dot,
+          dynamicStyles.dot,
           {
             opacity: dot3Anim,
             transform: [{ scale: dot3Anim }],
@@ -85,7 +88,7 @@ export default function LoadingDots({ isAnimating = true }: LoadingDotsProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -100,4 +103,3 @@ const styles = StyleSheet.create({
     marginHorizontal: Theme.spacing.xs,
   },
 });
-

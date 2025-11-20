@@ -7,9 +7,11 @@ import {
   Keyboard,
   ScrollView,
   Platform,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '../constants';
+import { useThemedColors } from '../hooks';
+import { useTheme } from '../contexts/ThemeContext';
 import type { ChatScreenProps } from '../types';
 import { useChatWebSocket } from '../hooks/useChatWebSocket';
 import {
@@ -18,6 +20,7 @@ import {
   EmojiPicker,
   ChatInput,
   ChatActions,
+  ThemeToggle,
 } from '../components';
 
 /**
@@ -26,6 +29,8 @@ import {
  */
 
 export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
+  const Colors = useThemedColors();
+  const { theme } = useTheme();
   const [message, setMessage] = useState('');
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -230,8 +235,21 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: Colors.background }]}
+      edges={['top']}
+    >
+      <StatusBar
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={Colors.background}
+        translucent
+      />
+
+      {/* Theme Toggle Button */}
+      <View style={styles.themeToggleContainer}>
+        <ThemeToggle />
+      </View>
+
       <Animated.View
         style={[
           styles.container,
@@ -294,12 +312,17 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.white,
   },
   container: {
     flex: 1,
   },
   content: {
     flex: 1,
+  },
+  themeToggleContainer: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    zIndex: 10,
   },
 });

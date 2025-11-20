@@ -11,7 +11,10 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Theme } from '../constants';
+import { Theme } from '../constants';
+import { useThemedColors } from '../hooks';
+import { useTheme } from '../contexts/ThemeContext';
+import { ThemeToggle } from '../components';
 import type { HomeScreenProps } from '../types';
 
 const { width, height } = Dimensions.get('window');
@@ -21,6 +24,10 @@ const { width, height } = Dimensions.get('window');
  * Modern, aesthetic home screen with glassmorphism, gradients, and smooth animations
  */
 export default function HomeScreen({ onStartChat }: HomeScreenProps) {
+  const Colors = useThemedColors();
+  const { theme } = useTheme();
+  const styles = createStyles(Colors);
+
   // Logo animations
   const logoFadeAnim = useRef(new Animated.Value(0)).current;
   const logoScaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -336,11 +343,20 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
   });
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: Colors.background }]}
+      edges={['top']}
+    >
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor={Colors.backgroundLight}
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={Colors.background}
+        translucent
       />
+
+      {/* Theme Toggle Button */}
+      <View style={styles.themeToggleContainer}>
+        <ThemeToggle />
+      </View>
 
       {/* Animated gradient background */}
       <View style={styles.backgroundContainer}>
@@ -556,226 +572,232 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.backgroundLight,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  backgroundContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-  },
-  gradientCircle: {
-    position: 'absolute',
-    borderRadius: Theme.borderRadius.full,
-  },
-  gradientCircle1: {
-    width: width * 1.2,
-    height: width * 1.2,
-    backgroundColor: Colors.primary,
-    top: -width * 0.3,
-    right: -width * 0.3,
-  },
-  gradientCircle2: {
-    width: width * 1.0,
-    height: width * 1.0,
-    backgroundColor: Colors.secondary,
-    bottom: -width * 0.25,
-    left: -width * 0.25,
-  },
-  gradientCircle3: {
-    width: width * 0.8,
-    height: width * 0.8,
-    backgroundColor: Colors.accent,
-    top: height * 0.3,
-    left: width * 0.1,
-  },
-  particle: {
-    position: 'absolute',
-    borderRadius: Theme.borderRadius.full,
-    backgroundColor: Colors.primary,
-    opacity: 0.15,
-  },
-  particle1: {
-    width: 60,
-    height: 60,
-    top: height * 0.15,
-    left: width * 0.2,
-  },
-  particle2: {
-    width: 40,
-    height: 40,
-    top: height * 0.7,
-    right: width * 0.15,
-  },
-  particle3: {
-    width: 50,
-    height: 50,
-    top: height * 0.5,
-    left: width * 0.7,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: Theme.spacing.xl,
-    zIndex: 1,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Theme.spacing.xl,
-    position: 'relative',
-  },
-  logoGlow: {
-    position: 'absolute',
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: Colors.primary,
-    opacity: 0.1,
-    top: -20,
-    left: -20,
-  },
-  logoImage: {
-    width: 140,
-    height: 140,
-    zIndex: 1,
-  },
-  titleContainer: {
-    alignItems: 'center',
-    marginBottom: Theme.spacing.md,
-  },
-  title: {
-    fontSize: Theme.fontSize.xxxl + 4,
-    fontWeight: Theme.fontWeight.bold,
-    color: Colors.textDark,
-    textAlign: 'center',
-    letterSpacing: -0.5,
-  },
-  titleUnderline: {
-    width: 60,
-    height: 4,
-    backgroundColor: Colors.primary,
-    borderRadius: Theme.borderRadius.sm,
-    marginTop: Theme.spacing.xs,
-    opacity: 0.6,
-  },
-  subtitleContainer: {
-    paddingHorizontal: Theme.spacing.lg,
-    marginBottom: Theme.spacing.xxl,
-  },
-  subtitle: {
-    fontSize: Theme.fontSize.md + 1,
-    color: Colors.textGray,
-    textAlign: 'center',
-    lineHeight: 24,
-    letterSpacing: 0.2,
-  },
-  featuresContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: Theme.spacing.xxl + Theme.spacing.md,
-    paddingHorizontal: Theme.spacing.sm,
-  },
-  featureCard: {
-    flex: 1,
-    backgroundColor: '#EDE9FE',
-    borderRadius: Theme.borderRadius.xl,
-    padding: Theme.spacing.md,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.15)',
-    marginHorizontal: Theme.spacing.xs,
-    ...Theme.shadow.small,
-  },
-  featureIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: Theme.spacing.sm,
-  },
-  featureIcon: {
-    fontSize: 28,
-  },
-  featureTitle: {
-    fontSize: Theme.fontSize.sm + 1,
-    color: Colors.textDark,
-    fontWeight: Theme.fontWeight.semibold,
-    marginBottom: Theme.spacing.xs / 2,
-    textAlign: 'center',
-  },
-  featureDescription: {
-    fontSize: Theme.fontSize.xs,
-    color: Colors.textGray,
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  startButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: Theme.spacing.md + 4,
-    paddingHorizontal: Theme.spacing.xl + Theme.spacing.md,
-    borderRadius: Theme.borderRadius.xl + 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: width * 0.7,
-    position: 'relative',
-    overflow: 'hidden',
-    ...Theme.shadow.large,
-    // Gradient effect
-    borderWidth: 0,
-  },
-  buttonGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: Colors.primaryDark,
-    opacity: 0,
-  },
-  buttonShine: {
-    position: 'absolute',
-    width: 100,
-    height: '200%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    transform: [{ rotate: '25deg' }],
-    top: -50,
-  },
-  startButtonText: {
-    color: Colors.white,
-    fontSize: Theme.fontSize.lg + 2,
-    fontWeight: Theme.fontWeight.bold,
-    marginRight: Theme.spacing.sm,
-    letterSpacing: 0.5,
-    zIndex: 1,
-  },
-  startButtonIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  startButtonIcon: {
-    color: Colors.white,
-    fontSize: Theme.fontSize.lg,
-    fontWeight: Theme.fontWeight.bold,
-  },
-});
+const createStyles = (Colors: ReturnType<typeof useThemedColors>) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      position: 'relative',
+      overflow: 'hidden',
+    },
+    themeToggleContainer: {
+      position: 'absolute',
+      top: 50,
+      right: Theme.spacing.md,
+      zIndex: 10,
+    },
+    backgroundContainer: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      top: 0,
+      left: 0,
+    },
+    gradientCircle: {
+      position: 'absolute',
+      borderRadius: Theme.borderRadius.full,
+      opacity: 0.15,
+    },
+    gradientCircle1: {
+      width: width * 1.2,
+      height: width * 1.2,
+      backgroundColor: Colors.gradientCircle1,
+      top: -width * 0.3,
+      right: -width * 0.3,
+    },
+    gradientCircle2: {
+      width: width * 1.0,
+      height: width * 1.0,
+      backgroundColor: Colors.gradientCircle2,
+      bottom: -width * 0.25,
+      left: -width * 0.25,
+    },
+    gradientCircle3: {
+      width: width * 0.8,
+      height: width * 0.8,
+      backgroundColor: Colors.gradientCircle3,
+      top: height * 0.3,
+      left: width * 0.1,
+    },
+    particle: {
+      position: 'absolute',
+      borderRadius: Theme.borderRadius.full,
+      backgroundColor: Colors.primary,
+      opacity: 0.15,
+    },
+    particle1: {
+      width: 60,
+      height: 60,
+      top: height * 0.15,
+      left: width * 0.2,
+    },
+    particle2: {
+      width: 40,
+      height: 40,
+      top: height * 0.7,
+      right: width * 0.15,
+    },
+    particle3: {
+      width: 50,
+      height: 50,
+      top: height * 0.5,
+      left: width * 0.7,
+    },
+    content: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: Theme.spacing.xl,
+      zIndex: 1,
+    },
+    logoContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: Theme.spacing.xl,
+      position: 'relative',
+    },
+    logoGlow: {
+      position: 'absolute',
+      width: 160,
+      height: 160,
+      borderRadius: 80,
+      backgroundColor: Colors.primary,
+      opacity: 0.1,
+      top: -20,
+      left: -20,
+    },
+    logoImage: {
+      width: 140,
+      height: 140,
+      zIndex: 1,
+    },
+    titleContainer: {
+      alignItems: 'center',
+      marginBottom: Theme.spacing.md,
+    },
+    title: {
+      fontSize: Theme.fontSize.xxxl + 4,
+      fontWeight: Theme.fontWeight.bold,
+      color: Colors.text,
+      textAlign: 'center',
+      letterSpacing: -0.5,
+    },
+    titleUnderline: {
+      width: 60,
+      height: 4,
+      backgroundColor: Colors.primary,
+      borderRadius: Theme.borderRadius.sm,
+      marginTop: Theme.spacing.xs,
+      opacity: 0.6,
+    },
+    subtitleContainer: {
+      paddingHorizontal: Theme.spacing.lg,
+      marginBottom: Theme.spacing.xxl,
+    },
+    subtitle: {
+      fontSize: Theme.fontSize.md + 1,
+      color: Colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      letterSpacing: 0.2,
+    },
+    featuresContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+      marginBottom: Theme.spacing.xxl + Theme.spacing.md,
+      paddingHorizontal: Theme.spacing.sm,
+    },
+    featureCard: {
+      flex: 1,
+      backgroundColor: Colors.glassBackground,
+      borderRadius: Theme.borderRadius.xl,
+      padding: Theme.spacing.md,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: Colors.glassBorder,
+      marginHorizontal: Theme.spacing.xs,
+      ...Theme.shadow.small,
+    },
+    featureIconContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: 'rgba(99, 102, 241, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: Theme.spacing.sm,
+    },
+    featureIcon: {
+      fontSize: 28,
+    },
+    featureTitle: {
+      fontSize: Theme.fontSize.sm + 1,
+      color: Colors.text,
+      fontWeight: Theme.fontWeight.semibold,
+      marginBottom: Theme.spacing.xs / 2,
+      textAlign: 'center',
+    },
+    featureDescription: {
+      fontSize: Theme.fontSize.xs,
+      color: Colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 16,
+    },
+    buttonContainer: {
+      width: '100%',
+      alignItems: 'center',
+    },
+    startButton: {
+      backgroundColor: Colors.primary,
+      paddingVertical: Theme.spacing.md + 4,
+      paddingHorizontal: Theme.spacing.xl + Theme.spacing.md,
+      borderRadius: Theme.borderRadius.xl + 4,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: width * 0.7,
+      position: 'relative',
+      overflow: 'hidden',
+      ...Theme.shadow.large,
+      borderWidth: 0,
+    },
+    buttonGradient: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: Colors.primaryDark,
+      opacity: 0,
+    },
+    buttonShine: {
+      position: 'absolute',
+      width: 100,
+      height: '200%',
+      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+      transform: [{ rotate: '25deg' }],
+      top: -50,
+    },
+    startButtonText: {
+      color: Colors.white,
+      fontSize: Theme.fontSize.lg + 2,
+      fontWeight: Theme.fontWeight.bold,
+      marginRight: Theme.spacing.sm,
+      letterSpacing: 0.5,
+      zIndex: 1,
+    },
+    startButtonIconContainer: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1,
+    },
+    startButtonIcon: {
+      color: Colors.white,
+      fontSize: Theme.fontSize.lg,
+      fontWeight: Theme.fontWeight.bold,
+    },
+  });
