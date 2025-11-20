@@ -453,12 +453,13 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
           </Text>
         </Animated.View>
 
-        {/* Feature cards with glassmorphism */}
+        {/* Feature cards with modern aesthetic */}
         <View style={styles.featuresContainer}>
           <Animated.View
             style={[
               styles.featureCard,
               {
+                borderTopColor: '#8B5CF6', // Violet
                 opacity: feature1Anim,
                 transform: [
                   {
@@ -471,7 +472,12 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
               },
             ]}
           >
-            <View style={styles.featureIconContainer}>
+            <View
+              style={[
+                styles.featureIconContainer,
+                { backgroundColor: 'rgba(139, 92, 246, 0.12)' },
+              ]}
+            >
               <Text style={styles.featureIcon}>🔒</Text>
             </View>
             <Text style={styles.featureTitle}>Anonymous</Text>
@@ -484,6 +490,7 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
             style={[
               styles.featureCard,
               {
+                borderTopColor: '#F59E0B', // Amber
                 opacity: feature2Anim,
                 transform: [
                   {
@@ -496,7 +503,12 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
               },
             ]}
           >
-            <View style={styles.featureIconContainer}>
+            <View
+              style={[
+                styles.featureIconContainer,
+                { backgroundColor: 'rgba(245, 158, 11, 0.12)' },
+              ]}
+            >
               <Text style={styles.featureIcon}>⚡</Text>
             </View>
             <Text style={styles.featureTitle}>Real-time</Text>
@@ -509,6 +521,7 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
             style={[
               styles.featureCard,
               {
+                borderTopColor: '#3B82F6', // Blue
                 opacity: feature3Anim,
                 transform: [
                   {
@@ -521,7 +534,12 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
               },
             ]}
           >
-            <View style={styles.featureIconContainer}>
+            <View
+              style={[
+                styles.featureIconContainer,
+                { backgroundColor: 'rgba(59, 130, 246, 0.12)' },
+              ]}
+            >
               <Text style={styles.featureIcon}>🌍</Text>
             </View>
             <Text style={styles.featureTitle}>Global</Text>
@@ -713,22 +731,26 @@ const createStyles = (Colors: ReturnType<typeof useThemedColors>) =>
       borderRadius: Theme.borderRadius.xl,
       padding: Theme.spacing.md,
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: Colors.glassBorder,
+      borderTopWidth: 4, // Top accent border
+      // Removed full border to look cleaner
       marginHorizontal: Theme.spacing.xs,
-      ...Theme.shadow.small,
+      // Enhanced shadow for floating effect
+      // shadowColor: Colors.text,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 1,
     },
     featureIconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: 'rgba(99, 102, 241, 0.2)',
+      width: 60,
+      height: 60,
+      borderRadius: 20, // Squircle shape
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: Theme.spacing.sm,
+      marginBottom: Theme.spacing.md,
     },
     featureIcon: {
-      fontSize: 28,
+      fontSize: 30,
     },
     featureTitle: {
       fontSize: Theme.fontSize.sm + 1,
