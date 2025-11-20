@@ -12,3 +12,12 @@ export { default as ChatInput } from './ChatInput';
 export { default as ChatActions } from './ChatActions';
 export { default as ThemeToggle } from './ThemeToggle';
 
+// HomeScreen and SplashScreen components
+export { default as AnimatedBackground } from './AnimatedBackground';
+export { default as AnimatedLogo } from './AnimatedLogo';
+export { default as TitleSection } from './TitleSection';
+export { default as FeatureCard } from './FeatureCard';
+export { default as StartButton } from './StartButton';
+export { default as FloatingBubbles } from './FloatingBubbles';
+export { default as LoadingIndicator } from './LoadingIndicator';
+
