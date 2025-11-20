@@ -33,6 +33,8 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+# Production keystore credentials (if stored in gradle.properties)
+android/gradle.properties.local
 .kotlin/
 
 # node.js
@@ -73,3 +75,5 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+android/gradle.properties

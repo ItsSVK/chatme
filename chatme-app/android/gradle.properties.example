@@ -1,0 +1,10 @@
+# Production Build Configuration
+# Copy this file to gradle.properties and fill in your keystore details
+# DO NOT commit gradle.properties with real passwords to git!
+
+# Release keystore configuration
+CHATME_RELEASE_STORE_FILE=chatme-release.keystore
+CHATME_RELEASE_KEY_ALIAS=chatme-key-alias
+CHATME_RELEASE_STORE_PASSWORD=your_keystore_password_here
+CHATME_RELEASE_KEY_PASSWORD=your_key_password_here
+
