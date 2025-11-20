@@ -38,7 +38,9 @@ function App() {
         {currentScreen === 'chat' && (
           <ChatScreen onEndChat={handleEndChat} onNextChat={handleNextChat} />
         )}
-        {currentScreen === 'home' && <HomeScreen onStartChat={handleStartChat} />}
+        {currentScreen === 'home' && (
+          <HomeScreen onStartChat={handleStartChat} />
+        )}
       </SafeAreaProvider>
     </ThemeProvider>
   );
