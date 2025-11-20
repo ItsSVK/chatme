@@ -337,6 +337,9 @@ export class ChatQueue extends DurableObject<Env> {
 			await this.releasePartner(sessionId, connection.currentPartnerId);
 		}
 
+		// add a delay of 2 seconds
+		await new Promise((resolve) => setTimeout(resolve, 2000));
+
 		// Try to find an available user
 		console.log(`Queue (Handle Search Start): ${this.availableQueue.isEmpty() ? '0' : '1'}`);
 
