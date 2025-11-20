@@ -5,7 +5,8 @@
 // Client → Server message types
 export interface ClientMessage {
 	type: 'search' | 'message' | 'end_chat' | 'ping';
-	text?: string; // For message type
+	text?: string; // For text message type
+	imageUrl?: string; // For GIF/sticker message type
 }
 
 export interface SearchMessage extends ClientMessage {
@@ -14,7 +15,8 @@ export interface SearchMessage extends ClientMessage {
 
 export interface ChatMessage extends ClientMessage {
 	type: 'message';
-	text: string;
+	text?: string;
+	imageUrl?: string;
 }
 
 export interface EndChatMessage extends ClientMessage {
@@ -30,7 +32,8 @@ export interface ServerMessage {
 	type: 'session_id' | 'matched' | 'searching' | 'message' | 'partner_disconnected' | 'pong' | 'chat_ended';
 	sessionId?: string; // For session_id type
 	partnerId?: string; // For matched type
-	text?: string; // For message type
+	text?: string; // For text message type
+	imageUrl?: string; // For GIF/sticker message type
 	from?: string; // For message type
 }
 
@@ -50,7 +53,8 @@ export interface SearchingMessage extends ServerMessage {
 
 export interface ServerChatMessage extends ServerMessage {
 	type: 'message';
-	text: string;
+	text?: string;
+	imageUrl?: string;
 	from: string;
 }
 

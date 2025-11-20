@@ -23,7 +23,8 @@ import {
 // Client → Server message types
 export interface ClientMessage {
   type: SEARCH | MESSAGE | END_CHAT | PING;
-  text?: string; // For message type
+  text?: string; // For text message type
+  imageUrl?: string; // For GIF/sticker message type
 }
 
 export interface SearchMessage extends ClientMessage {
@@ -32,7 +33,8 @@ export interface SearchMessage extends ClientMessage {
 
 export interface ChatMessage extends ClientMessage {
   type: MESSAGE;
-  text: string;
+  text?: string;
+  imageUrl?: string;
 }
 
 export interface EndChatMessage extends ClientMessage {
@@ -55,7 +57,8 @@ export interface ServerMessage {
     | CHAT_ENDED;
   sessionId?: string; // For session_id type
   partnerId?: string; // For matched type
-  text?: string; // For message type
+  text?: string; // For text message type
+  imageUrl?: string; // For GIF/sticker message type
   from?: string; // For message type
 }
 
@@ -75,7 +78,8 @@ export interface SearchingMessage extends ServerMessage {
 
 export interface ServerChatMessage extends ServerMessage {
   type: MESSAGE;
-  text: string;
+  text?: string;
+  imageUrl?: string;
   from: string;
 }
 

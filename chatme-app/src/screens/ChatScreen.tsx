@@ -46,6 +46,7 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
     connectionState,
     messages,
     sendMessage: sendWebSocketMessage,
+    sendImage: sendWebSocketImage,
     startSearch,
     endChat: endWebSocketChat,
     partnerId,
@@ -289,6 +290,7 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
             message={message}
             onChangeText={setMessage}
             onSend={handleSend}
+            onSendImage={sendWebSocketImage}
             onToggleEmojiPicker={toggleEmojiPicker}
             showEmojiPicker={showEmojiPicker}
             connectionState={connectionState}

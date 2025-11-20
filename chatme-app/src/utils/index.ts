@@ -5,4 +5,5 @@
 
 export * from './dateFormatting';
 export * from './messageHelpers';
+export * from './imageHelpers';
 

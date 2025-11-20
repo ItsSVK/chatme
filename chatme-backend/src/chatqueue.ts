@@ -252,7 +252,7 @@ export class ChatQueue extends DurableObject<Env> {
 					await this.handleSearch(ws);
 					break;
 				case 'message':
-					await this.handleMessage(ws, clientMsg.text || '');
+					await this.handleMessage(ws, clientMsg.text, clientMsg.imageUrl);
 					break;
 				case 'end_chat':
 					await this.handleEndChat(ws);
@@ -370,9 +370,9 @@ export class ChatQueue extends DurableObject<Env> {
 	}
 
 	/**
-	 * Handle chat message
+	 * Handle chat message (supports text and images/GIFs/stickers)
 	 */
-	private async handleMessage(ws: WebSocket, text: string): Promise<void> {
+	private async handleMessage(ws: WebSocket, text?: string, imageUrl?: string): Promise<void> {
 		const sessionId = ws.deserializeAttachment() as string;
 
 		const connection = this.connections.get(sessionId);
@@ -389,10 +389,17 @@ export class ChatQueue extends DurableObject<Env> {
 			return;
 		}
 
+		// Validate that we have either text or imageUrl
+		if (!text && !imageUrl) {
+			ws.send(JSON.stringify({ type: 'error', message: 'Message must have text or imageUrl' }));
+			return;
+		}
+
 		// Send message to partner
 		const msg: ServerChatMessage = {
 			type: 'message',
 			text: text,
+			imageUrl: imageUrl,
 			from: sessionId,
 		};
 

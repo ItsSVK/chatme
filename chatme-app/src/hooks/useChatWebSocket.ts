@@ -12,17 +12,13 @@ import type {
   ConnectionState,
 } from '../types/websocket';
 
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
+import type { Message } from '../types';
 
 interface UseChatWebSocketReturn {
   connectionState: ConnectionState;
   messages: Message[];
   sendMessage: (text: string) => void;
+  sendImage: (imageBase64: string) => void;
   startSearch: () => void;
   endChat: () => void;
   clearMessages: () => void;
@@ -75,23 +71,53 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
   }, [send, wsRef.current?.readyState]);
 
   /**
-   * Send a chat message
+   * Send a chat message (text only - URLs are not treated as images)
    */
   const sendMessage = useCallback(
     (text: string) => {
-      if (!text.trim()) return;
+      const trimmedText = text.trim();
+      if (!trimmedText) return;
 
       // Add message to local state immediately
       const newMessage: Message = {
         id: Date.now().toString(),
-        text: text.trim(),
+        text: trimmedText,
         isUser: true,
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, newMessage]);
 
       // Send to server
-      send({ type: 'message', text: text.trim() });
+      send({ type: 'message', text: trimmedText });
+    },
+    [send],
+  );
+
+  /**
+   * Send an image/GIF/sticker (base64 data URI only)
+   */
+  const sendImage = useCallback(
+    (imageBase64: string) => {
+      if (!imageBase64 || !imageBase64.trim()) return;
+
+      // Validate it's a base64 data URI
+      const { isBase64Image } = require('../utils/imageHelpers');
+      if (!isBase64Image(imageBase64)) {
+        console.warn('Invalid base64 image format');
+        return;
+      }
+
+      // Add message to local state immediately
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        imageUrl: imageBase64.trim(),
+        isUser: true,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, newMessage]);
+
+      // Send to server
+      send({ type: 'message', imageUrl: imageBase64.trim() });
     },
     [send],
   );
@@ -165,10 +191,11 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
           break;
 
         case 'message':
-          if (data.text && data.from) {
+          if (data.from && (data.text || data.imageUrl)) {
             const newMessage: Message = {
               id: `${data.from}-${Date.now()}`,
               text: data.text,
+              imageUrl: data.imageUrl,
               isUser: false,
               timestamp: new Date(),
             };
@@ -416,6 +443,7 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
     messages,
     clearMessages,
     sendMessage,
+    sendImage,
     startSearch,
     endChat,
     partnerId,

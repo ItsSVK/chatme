@@ -22,10 +22,12 @@ export interface NavigationProps {
 
 /**
  * Message interface for chat messages
+ * Supports text, GIFs, and stickers from system keyboard
  */
 export interface Message {
   id: string;
-  text: string;
+  text?: string; // Optional for GIF/sticker messages
+  imageUrl?: string; // For GIFs and stickers (can be URL or base64 data URI)
   isUser: boolean;
   timestamp: Date;
 }
