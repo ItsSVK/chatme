@@ -24,11 +24,33 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
   const slideAnim = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
+    // Fade in and slide up animation on mount
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     // Auto transition after 2.5 seconds
     const timer = setTimeout(() => {
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
+          duration: 500,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: -20,
           duration: 500,
           easing: Easing.in(Easing.cubic),
           useNativeDriver: true,
@@ -39,7 +61,7 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, [onFinish, fadeAnim]);
+  }, [onFinish, fadeAnim, slideAnim]);
 
   return (
     <SafeAreaView style={styles.splashContainer} edges={['top']}>
