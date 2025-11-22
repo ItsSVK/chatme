@@ -1,135 +1,236 @@
-# ChatMe - React Native Frontend
+# ChatMe Mobile App 📱
 
-Anonymous random chat app built with React Native and WebSocket.
+React Native mobile application for ChatMe anonymous chat platform.
 
-## Features
+## 🛠️ Tech Stack
 
-- 🔒 **Anonymous**: No registration required
-- ⚡ **Real-time**: Instant message delivery via WebSocket
-- 🌍 **Random Matching**: Queue-based algorithm pairs users randomly
-- 🔄 **Skip Partner**: Find new chat partners with "Next" button
-- 📱 **Cross-platform**: Works on iOS and Android
-- 🎨 **Modern UI**: Beautiful animations and smooth transitions
-- 🔌 **Auto-reconnect**: Handles network issues gracefully
+- **React Native 0.82** - Cross-platform mobile framework
+- **TypeScript** - Type-safe development
+- **react-native-config** - Environment variable management
+- **WebSocket API** - Real-time communication
+- **Custom Hooks** - State management
 
-## Prerequisites
+## ✨ Features
 
-- Node.js >= 20
-- React Native development environment setup
-- iOS: Xcode and CocoaPods
-- Android: Android Studio and Java SDK
+- 🎨 Modern UI with smooth animations
+- 🌓 Dark/Light theme support
+- ⚡ Real-time messaging via WebSocket
+- 🎭 Emoji support and quick reactions
+- 📱 Native iOS and Android support
+- 🔄 Auto-reconnection on network loss
+- 📊 Optimized for small screens
+- 🔐 Secure environment variable management
 
-## Installation
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 20+
+- React Native development environment
+  - **iOS**: Xcode 14+, CocoaPods
+  - **Android**: Android Studio, JDK 17+
+
+### Installation
+
+1. **Install dependencies**
+   ```bash
+   cd chatme-app
+   npm install
+   ```
+
+2. **Setup environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Configure `.env`**
+   ```env
+   WEBSOCKET_URL=wss://your-backend.workers.dev
+   API_KEY=your-api-key-here
+   RECONNECT_INTERVAL=3000
+   MAX_RECONNECT_ATTEMPTS=5
+   PING_INTERVAL=30000
+   ```
+
+4. **iOS Setup** (macOS only)
+   ```bash
+   cd ios
+   pod install
+   cd ..
+   ```
+
+5. **Run the app**
+   ```bash
+   # iOS
+   npm run ios
+   
+   # Android
+   npm run android
+   ```
+
+## 📁 Project Structure
+
+```
+chatme-app/
+├── src/
+│   ├── screens/            # Screen components
+│   │   ├── SplashScreen.tsx
+│   │   ├── HomeScreen.tsx
+│   │   └── ChatScreen.tsx
+│   ├── components/         # Reusable components
+│   │   ├── AnimatedBackground.tsx
+│   │   ├── ChatHeader.tsx
+│   │   ├── MessageList.tsx
+│   │   ├── ChatInput.tsx
+│   │   └── ChatActions.tsx
+│   ├── hooks/              # Custom React hooks
+│   │   └── useChatWebSocket.ts
+│   ├── contexts/           # React contexts
+│   │   └── ThemeContext.tsx
+│   ├── types/              # TypeScript types
+│   │   └── websocket.ts
+│   ├── config/             # App configuration
+│   │   └── index.ts
+│   ├── constants/          # Theme, colors
+│   └── assets/             # Images, fonts
+├── android/                # Android native code
+├── ios/                    # iOS native code
+└── App.tsx                 # Root component
+```
+
+## 🔧 Available Scripts
 
 ```bash
-npm install
-
-# iOS only
-cd ios && pod install && cd ..
+npm run android        # Run on Android
+npm run ios            # Run on iOS
+npm start              # Start Metro bundler
+npm run lint           # Run ESLint
+npm test               # Run tests
 ```
 
-## Configuration
+### Build Scripts
 
-Update WebSocket URL in `src/config/index.ts`:
+```bash
+# Android
+npm run build:android:apk    # Build APK
+npm run build:android:aab    # Build AAB (for Play Store)
+npm run build:android:clean  # Clean build
 
-```typescript
-WEBSOCKET_URL: 'wss://your-backend-url.workers.dev'
+# iOS
+# Use Xcode to build and archive
 ```
 
-## Running
+## 🌍 Environment Variables
+
+Environment variables are managed using `react-native-config`.
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `WEBSOCKET_URL` | WebSocket server URL | - |
+| `API_KEY` | API key for authentication | - |
+| `RECONNECT_INTERVAL` | Reconnection interval (ms) | 3000 |
+| `MAX_RECONNECT_ATTEMPTS` | Max reconnection attempts | 5 |
+| `PING_INTERVAL` | Keep-alive ping interval (ms) | 30000 |
+
+### Important Notes
+
+- **Rebuild required**: After changing `.env`, you must rebuild the app (not just reload)
+- **No quotes**: Don't use quotes in `.env` file values
+- **Platform-specific**: iOS and Android may need separate builds after env changes
+
+See [ENV_SETUP.md](./ENV_SETUP.md) for detailed environment setup guide.
+
+## 📱 Platform-Specific Setup
 
 ### iOS
 
-```bash
-npm run ios
-# or
-npx react-native run-ios
-```
+1. **Install CocoaPods dependencies**
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+2. **Open in Xcode**
+   ```bash
+   open ios/ChatMe.xcworkspace
+   ```
+
+3. **Configure signing**
+   - Select your development team
+   - Update bundle identifier
 
 ### Android
 
-```bash
-npm run android
-# or
-npx react-native run-android
-```
+1. **Open in Android Studio**
+   ```bash
+   open -a "Android Studio" android/
+   ```
 
-## Project Structure
+2. **Update app ID** (optional)
+   - Edit `android/app/build.gradle`
+   - Change `applicationId`
 
-```
-src/
-├── screens/          # Screen components
-│   ├── SplashScreen.tsx
-│   ├── HomeScreen.tsx
-│   └── ChatScreen.tsx
-├── hooks/            # Custom React hooks
-│   └── useChatWebSocket.ts
-├── types/            # TypeScript types
-│   ├── index.ts
-│   └── websocket.ts
-├── config/           # App configuration
-│   └── index.ts
-├── constants/        # Colors, theme, etc.
-├── assets/           # Images and resources
-└── components/       # Reusable components
-```
+## 🔌 WebSocket Integration
 
-## WebSocket Integration
-
-The app uses a custom `useChatWebSocket` hook that manages:
-
-- WebSocket connection lifecycle
-- Message sending/receiving
-- Connection state management
-- Auto-reconnection logic
-- Keep-alive pings
-
-### Usage Example
+The app uses a custom `useChatWebSocket` hook:
 
 ```typescript
 import { useChatWebSocket } from '../hooks/useChatWebSocket';
 
-function ChatScreen() {
-  const {
-    connectionState,
-    messages,
-    sendMessage,
-    startSearch,
-    endChat,
-    partnerId,
-    disconnect,
-  } = useChatWebSocket();
-
-  // Connection states: 'disconnected' | 'connecting' | 'connected' | 'searching' | 'matched' | 'error'
-}
+const {
+  connectionState,
+  messages,
+  sendMessage,
+  startSearch,
+  endChat,
+  partnerId,
+} = useChatWebSocket();
 ```
 
-## Testing
+## 🎨 Theming
 
-### Unit Tests
+The app supports dark and light themes. Theme is managed via `ThemeContext`:
 
-```bash
-npm test
+```typescript
+import { useTheme } from '../contexts/ThemeContext';
+
+const { theme, toggleTheme } = useTheme();
 ```
 
-### E2E Testing (Manual)
+## 🐛 Troubleshooting
 
-1. Run app on two devices/simulators
-2. Click "Start Chatting" on both
-3. Verify matching occurs
-4. Send messages from both sides
-5. Test "Next" and "End Chat" buttons
+### Environment Variables Not Loading
 
-## Troubleshooting
+**Problem:** App uses fallback values instead of `.env` values
 
-### Metro Bundler Issues
+**Solutions:**
+1. Rebuild the app completely (not just reload)
+2. Clean build:
+   ```bash
+   # Android
+   cd android && ./gradlew clean && cd ..
+   
+   # iOS
+   cd ios && pod install && cd ..
+   ```
+3. Verify no quotes in `.env` file
+4. Check `react-native-config` is properly linked
 
-```bash
-npx react-native start --reset-cache
-```
+### Connection Issues on Android
 
-### iOS Build Issues
+**Problem:** Can't connect to `localhost` backend
 
+**Solutions:**
+- Use your computer's IP address instead of `localhost`
+- Or use `adb reverse`:
+  ```bash
+  adb reverse tcp:8787 tcp:8787
+  ```
+
+### iOS Build Errors
+
+**Problem:** CocoaPods or build errors
+
+**Solutions:**
 ```bash
 cd ios
 pod deintegrate
@@ -137,48 +238,35 @@ pod install
 cd ..
 ```
 
-### Android Build Issues
+## 🚀 Deployment
 
-```bash
-cd android
-./gradlew clean
-cd ..
-```
+### Android
 
-### WebSocket Not Connecting
+1. **Generate signing key**
+   ```bash
+   keytool -genkey -v -keystore chatme-release-key.keystore -alias chatme -keyalg RSA -keysize 2048 -validity 10000
+   ```
 
-- Verify backend is deployed and accessible
-- Check WebSocket URL in `src/config/index.ts`
-- For Android local testing, use IP address instead of `localhost`
-- Check network permissions in AndroidManifest.xml
+2. **Configure signing** in `android/gradle.properties`
 
-## Scripts
+3. **Build release**
+   ```bash
+   npm run build:android:aab
+   ```
 
-- `npm run android` - Run on Android
-- `npm run ios` - Run on iOS
-- `npm start` - Start Metro bundler
-- `npm test` - Run tests
-- `npm run lint` - Lint code
+4. **Upload to Google Play Console**
 
-## Dependencies
+### iOS
 
-### Core
-- React 19.1.1
-- React Native 0.82.1
-- react-native-safe-area-context
+1. **Open Xcode**
+2. **Select "Any iOS Device"**
+3. **Product → Archive**
+4. **Distribute App → App Store Connect**
 
-### Dev Dependencies
-- TypeScript
-- ESLint
-- Jest
-- Babel
+## 📝 License
 
-## License
+MIT License - See [LICENSE](../LICENSE) for details
 
-MIT
+---
 
-## Support
-
-For setup and integration help, see:
-- `../QUICK_START.md` - Quick setup guide
-- `../INTEGRATION_GUIDE.md` - Detailed integration guide
+[← Back to Main README](../README.md)

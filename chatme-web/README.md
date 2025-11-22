@@ -1,215 +1,206 @@
-# ChatMe Web - Anonymous Random Chat
+# ChatMe Web App 🌐
 
-A modern, aesthetic web version of ChatMe built with React, featuring beautiful animations, glassmorphism design, and real-time WebSocket communication.
+React-based web application for ChatMe anonymous chat platform.
+
+## 🛠️ Tech Stack
+
+- **React 19** - Latest React with concurrent features
+- **TypeScript** - Type-safe development
+- **Vite** - Lightning-fast build tool
+- **Framer Motion** - Smooth animations
+- **WebSocket API** - Real-time communication
 
 ## ✨ Features
 
-- 🔒 **Anonymous** - No login, no registration
-- ⚡ **Real-time** - Instant message delivery via WebSocket
-- 🌍 **Random Matching** - Queue-based algorithm pairs users
-- 🔄 **Skip Partner** - Find new chat partners with "Next" button
-- 🎨 **Modern UI** - Glassmorphism, gradients, and smooth animations
-- 🌓 **Dark/Light Theme** - Toggle between themes with persistence
-- 📱 **Responsive** - Works on desktop, tablet, and mobile
+- 🎨 Modern UI with glassmorphism effects
+- 🌓 Dark/Light theme support
+- ⚡ Real-time messaging via WebSocket
+- 🎭 Emoji picker and quick reactions
+- 📱 Responsive design for all screen sizes
+- 🔄 Auto-reconnection on network loss
+- 📊 Environment-aware logging
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js >= 20
-- Backend already deployed at `wss://chatme-backend.connectshouvik.workers.dev`
+- Node.js 20+
+- npm or yarn
 
 ### Installation
 
-```bash
-# Install dependencies
-npm install
+1. **Install dependencies**
+   ```bash
+   cd chatme-web
+   npm install
+   ```
 
-# Configure environment variables
-cp .env.example .env.local
-# Edit .env.local and add your API key
+2. **Setup environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
 
-# Run development server
-npm run dev
+3. **Configure `.env.local`**
+   ```env
+   VITE_WEBSOCKET_URL=wss://your-backend.workers.dev
+   VITE_API_KEY=your-api-key-here
+   ```
 
-# Build for production
-npm run build
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-# Preview production build
-npm run preview
-```
-
-## 🏗️ Tech Stack
-
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Fast build tool
-- **Framer Motion** - Smooth animations
-- **React Router** - Navigation
-- **WebSocket** - Real-time communication
+   App will be available at `http://localhost:5173`
 
 ## 📁 Project Structure
 
 ```
 chatme-web/
 ├── src/
-│   ├── components/          # Reusable UI components
-│   ├── hooks/               # Custom React hooks
-│   ├── contexts/            # React contexts
-│   ├── screens/             # Page components
-│   ├── types/               # TypeScript types
-│   ├── config/              # Configuration
-│   ├── styles/              # Global styles
-│   ├── App.tsx              # Main app component
-│   └── main.tsx             # Entry point
-├── index.html
-├── package.json
-└── vite.config.ts
+│   ├── components/          # Reusable components
+│   │   ├── common/         # Common UI components
+│   │   └── chat/           # Chat-specific components
+│   ├── screens/            # Page components
+│   │   ├── HomeScreen/
+│   │   └── ChatScreen/
+│   ├── hooks/              # Custom React hooks
+│   │   └── useChatWebSocket.ts
+│   ├── utils/              # Utility functions
+│   │   └── logger.ts       # Environment-aware logger
+│   ├── types/              # TypeScript types
+│   ├── config/             # App configuration
+│   └── App.tsx             # Root component
+├── public/                 # Static assets
+└── index.html             # HTML template
 ```
 
-## 🎨 Design Features
+## 🔧 Available Scripts
 
-### Glassmorphism
-- Frosted glass effect with backdrop blur
-- Subtle borders and shadows
-- Semi-transparent backgrounds
+```bash
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run preview    # Preview production build
+npm run lint       # Run ESLint
+```
 
-### Animations
-- Framer Motion for smooth transitions
-- Staggered entrance animations
-- Hover and tap interactions
-- Floating background orbs
+## 🌍 Environment Variables
 
-### Responsive Design
-- Mobile-first approach
-- Breakpoints for tablet and desktop
-- Touch-friendly interactions
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `VITE_WEBSOCKET_URL` | WebSocket server URL | `wss://chatme-backend.workers.dev` |
+| `VITE_API_KEY` | API key for authentication | `your-secret-key` |
 
-### Theme Support
-- Dark and light themes
-- Smooth theme transitions
-- localStorage persistence
+**Note:** All environment variables must be prefixed with `VITE_` to be exposed to the client.
+
+## 🎨 Customization
+
+### Theme
+
+Edit `src/constants/theme.ts` to customize colors, spacing, and typography:
+
+```typescript
+export const Theme = {
+  colors: {
+    primary: '#6366F1',
+    // ... more colors
+  },
+  spacing: {
+    sm: 8,
+    md: 16,
+    // ... more spacing
+  },
+};
+```
+
+### Components
+
+All components are in `src/components/` and use TypeScript for type safety.
 
 ## 🔌 WebSocket Integration
 
-The web app uses the same backend as the mobile app:
-- Backend URL: `wss://chatme-backend.connectshouvik.workers.dev`
-- Auto-reconnection on network loss
-- Keep-alive mechanism (ping/pong)
-- Connection state management
+The app uses a custom `useChatWebSocket` hook for WebSocket communication:
 
-### Message Flow
+```typescript
+import { useChatWebSocket } from '../hooks/useChatWebSocket';
 
-1. User opens chat screen
-2. WebSocket connects to backend
-3. Sends 'search' message
-4. Backend matches with another user
-5. Real-time messaging begins
-6. User can "Next" to find new partner or "End Chat" to disconnect
+const {
+  connectionState,
+  messages,
+  sendMessage,
+  startSearch,
+  endChat,
+} = useChatWebSocket();
+```
 
-## 🧪 Testing
+## 📊 Logging
 
-### Run Two Browser Tabs
+The app uses an environment-aware logger that only shows debug logs in development:
 
-1. Open `http://localhost:5173` in two tabs
-2. Click "Start Chatting" in both
-3. Wait for matching
-4. Send messages between tabs
+```typescript
+import { logger } from '../utils/logger';
 
-### Test Checklist
+logger.debug('Only in development');
+logger.info('Only in development');
+logger.warn('Shows in both dev and prod');
+logger.error('Shows in both dev and prod');
+```
 
-- [ ] Home screen animations
-- [ ] Theme toggle functionality
-- [ ] WebSocket connection
-- [ ] User matching
-- [ ] Message sending/receiving
-- [ ] Emoji picker
-- [ ] "Next Chat" functionality
-- [ ] "End Chat" and return to home
-- [ ] Responsive design on different screen sizes
-- [ ] Dark/Light theme switching
+## 🚀 Deployment
 
-## 🌐 Deployment
-
-### Vercel (Recommended)
+### Build for Production
 
 ```bash
-# Install Vercel CLI
-npm i -g vercel
+npm run build
+```
 
-# Deploy
+This creates an optimized build in the `dist/` directory.
+
+### Deploy to Vercel
+
+```bash
+npm install -g vercel
 vercel
 ```
 
-### Netlify
+### Deploy to Netlify
 
 ```bash
-# Build
-npm run build
-
-# Deploy dist/ folder to Netlify
+npm install -g netlify-cli
+netlify deploy --prod
 ```
 
-### GitHub Pages
+### Deploy to Cloudflare Pages
 
 ```bash
-# Build
-npm run build
-
-# Deploy dist/ folder to gh-pages branch
+npx wrangler pages publish dist
 ```
 
-## 🔐 Security Configuration
+## 🐛 Troubleshooting
 
-### Environment Variables
+### WebSocket Connection Issues
 
-Create a `.env.local` file in the root directory:
+**Problem:** Can't connect to WebSocket server
 
-```env
-VITE_API_KEY=your-api-key-here
-```
+**Solutions:**
+- Verify `VITE_WEBSOCKET_URL` in `.env.local`
+- Ensure backend is running and accessible
+- Check browser console for errors
+- Verify CORS settings on backend
 
-**Important:**
-- Never commit `.env.local` to version control
-- Use different API keys for development and production
-- See `BACKEND_SECURITY.md` for backend implementation
+### Build Errors
 
-### Configuration
+**Problem:** Build fails with TypeScript errors
 
-Edit `src/config/index.ts` to change WebSocket URL or other settings:
+**Solutions:**
+- Run `npm install` to ensure all dependencies are installed
+- Check TypeScript version compatibility
+- Clear `node_modules` and reinstall: `rm -rf node_modules && npm install`
 
-```typescript
-export const Config = {
-  WEBSOCKET_URL: 'wss://chatme-backend.connectshouvik.workers.dev',
-  API_KEY: import.meta.env.VITE_API_KEY || '',
-  RECONNECT_INTERVAL: 3000,
-  MAX_RECONNECT_ATTEMPTS: 5,
-  PING_INTERVAL: 30000,
-} as const;
-```
+## 📝 License
 
-## 🎯 Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## 📄 License
-
-MIT License
-
-## 🙏 Acknowledgments
-
-Built with:
-- React
-- Framer Motion
-- Vite
-- TypeScript
-- WebSocket Protocol
+MIT License - See [LICENSE](../LICENSE) for details
 
 ---
 
-**Made with ❤️ for anonymous chatting**
-
-🌍 Connect with strangers worldwide • 💬 Chat anonymously • 🚀 Built with modern tech
+[← Back to Main README](../README.md)

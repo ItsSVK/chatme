@@ -1,12 +1,17 @@
-# ChatMe - Anonymous Random Chat App
+# ChatMe 💬
 
 <div align="center">
 
-🎉 **Backend and Frontend are now fully integrated!** 🎉
+🔒 **Anonymous Real-Time Chat Platform**
 
-Real-time anonymous chat with WebSocket communication
+Connect with random strangers worldwide through secure WebSocket communication
 
-[Quick Start](#-quick-start) • [Features](#-features) • [Documentation](#-documentation) • [Deploy](#-deployment)
+[Quick Start](#-quick-start) • [Features](#-features) • [Documentation](#-documentation) • [Architecture](#-architecture)
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-19-61dafb.svg)
+![React Native](https://img.shields.io/badge/React%20Native-0.82-61dafb.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg)
 
 </div>
 
@@ -14,84 +19,28 @@ Real-time anonymous chat with WebSocket communication
 
 ## 📱 Overview
 
-ChatMe is an anonymous random chat application where users can connect with strangers worldwide in real-time. No registration required, just tap and start chatting!
+ChatMe is a modern anonymous chat platform that connects users with random strangers in real-time. Built with cutting-edge web technologies, it offers seamless cross-platform experience on web and mobile.
 
-### Tech Stack
-
-**Frontend:**
-- React Native 0.82.1
-- TypeScript
-- WebSocket (Native API)
-- Custom hooks for state management
-
-**Backend:**
-- Cloudflare Workers
-- Durable Objects
-- WebSocket (Cloudflare API)
-- Queue-based matching algorithm
+**No registration • No data collection • Complete anonymity**
 
 ---
 
 ## ✨ Features
 
 ### Core Features
-- 🔒 **Anonymous** - No login, no registration
-- ⚡ **Real-time** - Instant message delivery via WebSocket
-- 🌍 **Random Matching** - Queue-based algorithm pairs users
-- 🔄 **Skip Partner** - Find new chat partners with "Next" button
-- 📱 **Cross-platform** - iOS and Android support
-- 🎨 **Modern UI** - Beautiful animations and smooth UX
+- 🔒 **Anonymous Chatting** - No login or registration required
+- ⚡ **Real-Time Messaging** - Instant WebSocket-based communication
+- 🌍 **Global Matching** - Queue-based algorithm pairs users worldwide
+- 🔄 **Smart Reconnection** - Automatic reconnection with exponential backoff
+- 📱 **Cross-Platform** - Web app and native mobile apps (iOS & Android)
 
 ### Technical Features
-- ✅ Auto-reconnection on network loss
-- ✅ Keep-alive mechanism (ping/pong)
-- ✅ Connection state management
-- ✅ Partner tracking
-- ✅ Message synchronization
-- ✅ Graceful error handling
-- ✅ App backgrounding support
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js >= 20
-- Cloudflare account (free tier works)
-- React Native environment setup
-
-### 3-Step Setup
-
-```bash
-# 1. Deploy Backend
-cd chatme-backend
-npm install
-npx wrangler login
-npx wrangler deploy
-# Copy the URL shown
-
-# 2. Configure Frontend
-# Edit: chatme-app/src/config/index.ts
-# Update: WEBSOCKET_URL to your backend URL (use wss://)
-
-# 3. Run App
-cd chatme-app
-npm install
-npm run ios  # or npm run android
-```
-
-**Detailed guide:** See [QUICK_START.md](./QUICK_START.md)
-
----
-
-## 📖 Documentation
-
-| Document | Description |
-|----------|-------------|
-| [QUICK_START.md](./QUICK_START.md) | Fast setup for testing |
-| [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) | Complete integration guide |
-| [MESSAGE_FLOW.md](./MESSAGE_FLOW.md) | WebSocket message flow |
-| [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) | What was built |
+- 🎨 Modern UI with glassmorphism and dark/light themes
+- 🔐 API key authentication and CORS protection
+- 🚀 Edge computing with Cloudflare Workers
+- 💾 Stateful connections with Durable Objects
+- 🎭 Emoji support and quick reactions
+- 📊 Environment-aware logging system
 
 ---
 
@@ -99,199 +48,194 @@ npm run ios  # or npm run android
 
 ```
 chatme/
-├── chatme-backend/           # Cloudflare Worker backend
-│   ├── src/
-│   │   ├── index.ts         # Worker entry point
-│   │   ├── chatqueue.ts     # Durable Object with queue logic
-│   │   └── types.ts         # Message type definitions
-│   ├── wrangler.jsonc       # Cloudflare configuration
-│   └── package.json
-│
-└── chatme-app/              # React Native frontend
-    ├── src/
-    │   ├── screens/         # UI screens
-    │   │   ├── SplashScreen.tsx
-    │   │   ├── HomeScreen.tsx
-    │   │   └── ChatScreen.tsx    [✓ WebSocket integrated]
-    │   ├── hooks/           # Custom React hooks
-    │   │   └── useChatWebSocket.ts  [NEW]
-    │   ├── types/           # TypeScript types
-    │   │   └── websocket.ts        [NEW]
-    │   ├── config/          # App configuration
-    │   │   └── index.ts            [NEW]
-    │   ├── constants/       # Colors, theme
-    │   ├── assets/          # Images
-    │   └── components/      # Reusable components
-    ├── App.tsx
-    └── package.json
+├── chatme-web/          # React web application
+│   └── README.md        # Web app documentation
+├── chatme-app/          # React Native mobile application
+│   └── README.md        # Mobile app documentation
+└── chatme-backend/      # Cloudflare Workers backend
+    └── README.md        # Backend documentation
+```
+
+### Projects
+
+| Project | Description | Tech Stack |
+|---------|-------------|------------|
+| **[Web App](./chatme-web)** | React-based web application | React 19, TypeScript, Vite, Framer Motion |
+| **[Mobile App](./chatme-app)** | Native mobile application | React Native 0.82, TypeScript |
+| **[Backend](./chatme-backend)** | WebSocket server | Cloudflare Workers, Durable Objects |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 20+
+- npm or yarn
+- Cloudflare account (for backend deployment)
+- Android Studio or Xcode (for mobile development)
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/chatme.git
+   cd chatme
+   ```
+
+2. **Choose your platform**
+   
+   Each project has its own detailed setup guide:
+   - **[Web App Setup →](./chatme-web/README.md)** - For web development
+   - **[Mobile App Setup →](./chatme-app/README.md)** - For iOS/Android development
+   - **[Backend Setup →](./chatme-backend/README.md)** - For deploying the server
+
+### Quick Test (All Platforms)
+
+```bash
+# 1. Start Backend
+cd chatme-backend
+npm install
+npx wrangler dev
+
+# 2. Start Web App (in new terminal)
+cd chatme-web
+npm install
+npm run dev
+
+# 3. Start Mobile App (in new terminal)
+cd chatme-app
+npm install
+npm run android  # or npm run ios
 ```
 
 ---
 
-## 🔌 WebSocket Integration
+## 🛠️ Tech Stack
+
+### Frontend
+- **Web**: React 19, TypeScript, Vite, Framer Motion
+- **Mobile**: React Native 0.82, TypeScript
+- WebSocket API for real-time communication
+- Environment-aware logging
+- Modern UI with animations
+
+### Backend
+- **Cloudflare Workers** - Serverless edge computing
+- **Durable Objects** - Stateful WebSocket connections
+- TypeScript
+- Queue-based matching algorithm
+- Persistent state with hibernation support
+
+---
+
+## 📖 Documentation
+
+### Project-Specific Guides
+- **[Web App Documentation](./chatme-web/README.md)** - Setup, development, and deployment
+- **[Mobile App Documentation](./chatme-app/README.md)** - Environment setup, building, and testing
+- **[Backend Documentation](./chatme-backend/README.md)** - API, deployment, and monitoring
+
+### Additional Resources
+- [Quick Start Guide](./QUICK_START.md) - Fast setup for testing
+- [Integration Guide](./INTEGRATION_GUIDE.md) - Complete integration walkthrough
+- [Message Flow](./MESSAGE_FLOW.md) - WebSocket message protocol
+- [Implementation Summary](./IMPLEMENTATION_SUMMARY.md) - Architecture overview
+
+---
+
+## 🔌 Architecture
 
 ### Connection Flow
 
 ```mermaid
 graph LR
-    A[User Opens App] --> B[Connect WebSocket]
-    B --> C[Send 'search' Message]
-    C --> D{Partner Available?}
-    D -->|Yes| E[Matched!]
-    D -->|No| F[Searching...]
-    F --> D
-    E --> G[Chat in Real-time]
-    G --> H{User Action}
-    H -->|Next| C
-    H -->|End Chat| I[Disconnect]
+    A[Client] -->|WebSocket| B[Cloudflare Worker]
+    B -->|Route| C[Durable Object]
+    C -->|Queue| D[Matching Algorithm]
+    D -->|Match| E[Partner Connection]
+    E -->|Messages| A
 ```
 
-### Message Types
+### Message Protocol
 
 **Client → Server:**
-```typescript
-{ type: 'search' }              // Find partner
-{ type: 'message', text: '...' } // Send message
-{ type: 'end_chat' }            // Disconnect
-{ type: 'ping' }                // Keep-alive
-```
+- `search` - Find a chat partner
+- `message` - Send text/emoji
+- `end_chat` - Disconnect
+- `ping` - Keep-alive
 
 **Server → Client:**
-```typescript
-{ type: 'searching' }                        // In queue
-{ type: 'matched', partnerId: '...' }        // Matched
-{ type: 'message', text: '...', from: '...' } // Received message
-{ type: 'partner_disconnected' }             // Partner left
-{ type: 'pong' }                             // Keep-alive response
-```
+- `searching` - In queue
+- `matched` - Partner found
+- `message` - Received message
+- `partner_disconnected` - Partner left
+- `pong` - Keep-alive response
+
+---
+
+## 🔐 Security
+
+- ✅ API key authentication for all connections
+- ✅ CORS protection with whitelisted origins
+- ✅ Secure environment variable management
+- ✅ No message persistence (privacy-first)
+- ✅ Anonymous sessions (no user data collected)
+
+---
+
+## 🎯 Roadmap
+
+### Phase 1 - Core Features
+- [x] Anonymous chat
+- [x] Real-time messaging
+- [x] Partner matching
+- [x] Web and mobile apps
+- [x] Secure WebSocket communication
+
+### Phase 2 - Enhancements
+- [ ] Image/GIF sharing
+- [ ] Typing indicators
+- [ ] Read receipts
+- [ ] Interest-based matching
+- [ ] Message timestamps
+
+### Phase 3 - Advanced
+- [ ] Voice messages
+- [ ] Video chat support
+- [ ] Group chats
+- [ ] Chat history (optional, encrypted)
+- [ ] Multi-language support
 
 ---
 
 ## 🧪 Testing
 
-### Run Two Instances
+### Run Multiple Instances
 
-**iOS Simulators:**
+**Web:**
 ```bash
-# Terminal 1
-npx react-native run-ios --simulator="iPhone 15"
-
-# Terminal 2
-npx react-native run-ios --simulator="iPhone 15 Pro"
+# Open multiple browser tabs at http://localhost:5173
 ```
 
-**Android Emulators:**
+**Mobile:**
 ```bash
-# Terminal 1
-npm run android
+# iOS - Two simulators
+npx react-native run-ios --simulator="iPhone 15"
+npx react-native run-ios --simulator="iPhone 15 Pro"
 
-# Terminal 2 (with second emulator running)
+# Android - Two emulators
+npm run android
 npx react-native run-android --deviceId=emulator-5556
 ```
 
 ### Test Checklist
-- [ ] Both devices connect
-- [ ] Matching occurs
-- [ ] Messages send/receive
-- [ ] "Next" finds new partner
-- [ ] "End Chat" disconnects
+- [ ] Connection establishment
+- [ ] Partner matching
+- [ ] Message sending/receiving
+- [ ] "Next" button (find new partner)
+- [ ] "End Chat" button (disconnect)
 - [ ] Reconnection after network loss
-
----
-
-## 🚀 Deployment
-
-### Backend (Cloudflare Workers)
-
-```bash
-cd chatme-backend
-npx wrangler deploy
-```
-
-Monitor logs:
-```bash
-npx wrangler tail
-```
-
-View dashboard: https://dash.cloudflare.com
-
-### Frontend (React Native)
-
-**iOS:**
-1. Open `chatme-app/ios/ChatMe.xcworkspace` in Xcode
-2. Select target device/simulator
-3. Update bundle identifier and signing
-4. Build and run (Cmd + R)
-
-**Android:**
-1. Open `chatme-app/android` in Android Studio
-2. Update app ID in `build.gradle`
-3. Generate signed APK (Build → Generate Signed Bundle/APK)
-4. Distribute via Google Play or direct APK
-
----
-
-## ⚙️ Configuration
-
-### WebSocket URL
-
-Edit `chatme-app/src/config/index.ts`:
-
-```typescript
-export const Config = {
-  WEBSOCKET_URL: 'wss://your-backend.workers.dev',  // UPDATE THIS
-  RECONNECT_INTERVAL: 3000,
-  MAX_RECONNECT_ATTEMPTS: 5,
-  PING_INTERVAL: 30000,
-} as const;
-```
-
-### Local Development
-
-For local testing with `wrangler dev`:
-
-```typescript
-WEBSOCKET_URL: __DEV__ && true
-  ? 'ws://localhost:8787'  // Local (change to true)
-  : 'wss://your-backend.workers.dev',  // Production
-```
-
-**Android Note:** Use your computer's IP instead of `localhost`:
-```typescript
-'ws://192.168.1.x:8787'  // Replace with your IP
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Connection Issues
-
-**Problem:** WebSocket won't connect
-
-**Solutions:**
-- Verify backend is deployed: Visit URL in browser
-- Check URL in config uses `wss://` (not `https://`)
-- For local testing, ensure `wrangler dev` is running
-- For Android local, use IP address not `localhost`
-
-### Matching Issues
-
-**Problem:** Stuck on "Searching..."
-
-**Solutions:**
-- Need 2+ users searching simultaneously
-- Try opening second simulator/device
-- Check backend logs with `npx wrangler tail`
-
-### Message Issues
-
-**Problem:** Messages not sending
-
-**Solutions:**
-- Verify status shows "Online" (not "Searching...")
-- Check console logs for errors
-- Confirm partner is still connected
+- [ ] Cross-platform compatibility
 
 ---
 
@@ -303,82 +247,36 @@ cd chatme-backend
 npx wrangler tail
 ```
 
-### Frontend Logs
-- React Native: Metro bundler console
-- iOS: Xcode console
-- Android: Logcat/Android Studio
-
 ### Cloudflare Dashboard
-- Analytics: Request count, errors
+- Analytics: Request count, errors, latency
 - Logs: Real-time WebSocket events
 - Durable Objects: Storage and compute usage
 
 ---
 
-## 🔐 Security
+## 🤝 Contributing
 
-### Current
-- ✅ Anonymous (no user data)
-- ✅ Secure WebSocket (wss://)
-- ✅ No message persistence
-- ✅ Ephemeral sessions
+Contributions are welcome! Please follow these steps:
 
-### Recommended
-- ⚠️ Rate limiting
-- ⚠️ Content moderation
-- ⚠️ User reporting
-- ⚠️ CAPTCHA/bot prevention
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
-## 💡 Future Enhancements
+## 📄 License
 
-### Phase 1
-- [ ] Typing indicators
-- [ ] Read receipts
-- [ ] Message timestamps
-- [ ] Sound notifications
-- [ ] Emoji reactions
-
-### Phase 2
-- [ ] Interest-based matching
-- [ ] Image/GIF sharing
-- [ ] Chat history (local)
-- [ ] Profanity filter
-- [ ] User preferences
-
-### Phase 3
-- [ ] Video chat
-- [ ] Group chats
-- [ ] Location-based matching
-- [ ] Web version
-- [ ] Analytics dashboard
-
----
-
-## 📝 License
-
-MIT License - See LICENSE file
+MIT License - See [LICENSE](./LICENSE) file for details
 
 ---
 
 ## 🙏 Acknowledgments
 
-Built with:
-- React Native
-- Cloudflare Workers & Durable Objects
-- WebSocket Protocol
-- TypeScript
-
----
-
-## 📞 Support
-
-For help and documentation:
-- [Quick Start Guide](./QUICK_START.md)
-- [Integration Guide](./INTEGRATION_GUIDE.md)
-- [Message Flow Documentation](./MESSAGE_FLOW.md)
-- [Implementation Summary](./IMPLEMENTATION_SUMMARY.md)
+- Inspired by Omegle and other anonymous chat platforms
+- Built with React, React Native, and Cloudflare Workers
+- Special thanks to the open-source community
 
 ---
 
@@ -386,7 +284,8 @@ For help and documentation:
 
 **Made with ❤️ for anonymous chatting**
 
-🌍 Connect with strangers worldwide • 💬 Chat anonymously • 🚀 Built with modern tech
+🌍 Connect worldwide • 💬 Chat anonymously • 🚀 Built with modern tech
+
+⭐ **Star this repo if you find it helpful!**
 
 </div>
-
