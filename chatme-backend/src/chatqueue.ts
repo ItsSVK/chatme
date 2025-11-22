@@ -252,7 +252,7 @@ export class ChatQueue extends DurableObject<Env> {
 					await this.handleSearch(ws);
 					break;
 				case 'message':
-					await this.handleMessage(ws, clientMsg.text || '');
+					await this.handleMessage(ws, clientMsg.text, clientMsg.imageUrl);
 					break;
 				case 'end_chat':
 					await this.handleEndChat(ws);
@@ -337,6 +337,9 @@ export class ChatQueue extends DurableObject<Env> {
 			await this.releasePartner(sessionId, connection.currentPartnerId);
 		}
 
+		// add a delay of 2 seconds
+		await new Promise((resolve) => setTimeout(resolve, 2000));
+
 		// Try to find an available user
 		console.log(`Queue (Handle Search Start): ${this.availableQueue.isEmpty() ? '0' : '1'}`);
 
@@ -367,14 +370,14 @@ export class ChatQueue extends DurableObject<Env> {
 	}
 
 	/**
-	 * Handle chat message
+	 * Handle chat message (supports text and images/GIFs/stickers)
 	 */
-	private async handleMessage(ws: WebSocket, text: string): Promise<void> {
+	private async handleMessage(ws: WebSocket, text?: string, imageUrl?: string): Promise<void> {
 		const sessionId = ws.deserializeAttachment() as string;
 
 		const connection = this.connections.get(sessionId);
 		if (!connection || !connection.currentPartnerId) {
-			ws.send(JSON.stringify({ type: 'error', message: 'Not connected to anyone' }));
+			ws.send(JSON.stringify({ type: 'partner_disconnected' }));
 			return; // Not connected to anyone
 		}
 
@@ -382,7 +385,13 @@ export class ChatQueue extends DurableObject<Env> {
 		if (!partnerConnection) {
 			// Partner disconnected, clean up
 			connection.currentPartnerId = null;
-			ws.send(JSON.stringify({ type: 'error', message: 'Partner disconnected' }));
+			ws.send(JSON.stringify({ type: 'partner_disconnected' }));
+			return;
+		}
+
+		// Validate that we have either text or imageUrl
+		if (!text && !imageUrl) {
+			ws.send(JSON.stringify({ type: 'error', message: 'Message must have text or imageUrl' }));
 			return;
 		}
 
@@ -390,6 +399,7 @@ export class ChatQueue extends DurableObject<Env> {
 		const msg: ServerChatMessage = {
 			type: 'message',
 			text: text,
+			imageUrl: imageUrl,
 			from: sessionId,
 		};
 
