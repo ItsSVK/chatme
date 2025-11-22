@@ -18,6 +18,7 @@ interface UserConnection {
 	sessionId: string;
 	ws: WebSocket;
 	currentPartnerId: string | null;
+	isAuthenticated: boolean; // Track authentication status
 }
 
 class Queue {
@@ -109,9 +110,26 @@ export class ChatQueue extends DurableObject<Env> {
 					sessionId,
 					ws,
 					currentPartnerId: null, // Will be restored from storage
+					isAuthenticated: false, // Will need to re-authenticate
 				});
 				console.log(`Restored connection for session: ${sessionId}`);
 			}
+		}
+
+		// Load authenticated sessions from storage
+		try {
+			const authenticatedSessions = await this.ctx.storage.get<string[]>('authenticatedSessions');
+			if (authenticatedSessions && Array.isArray(authenticatedSessions)) {
+				for (const sessionId of authenticatedSessions) {
+					const connection = this.connections.get(sessionId);
+					if (connection) {
+						connection.isAuthenticated = true;
+						console.log(`Restored auth for session: ${sessionId}`);
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error loading authenticated sessions:', error);
 		}
 
 		// Load partner relationships from storage
@@ -204,6 +222,7 @@ export class ChatQueue extends DurableObject<Env> {
 			sessionId: connectionId,
 			ws: server,
 			currentPartnerId: null,
+			isAuthenticated: false, // Starts unauthenticated
 		});
 
 		// Return response with WebSocket
@@ -237,14 +256,32 @@ export class ChatQueue extends DurableObject<Env> {
 					sessionId,
 					ws,
 					currentPartnerId: null,
+					isAuthenticated: false,
 				});
 			} else {
 				// Update WebSocket reference in case it changed
 				this.connections.get(sessionId)!.ws = ws;
 			}
 
-			// Get sessionId from WebSocket attachment
-			// const sessionId = ws.deserializeAttachment() as string;
+			const connection = this.connections.get(sessionId)!;
+
+			// Handle authentication first
+			if (clientMsg.type === 'auth') {
+				await this.handleAuth(ws, clientMsg.apiKey);
+				return;
+			}
+
+			// Require authentication for all other messages
+			if (!connection.isAuthenticated) {
+				console.log(`Unauthenticated request from ${sessionId}`);
+				const errorMsg: ServerMessage = {
+					type: 'auth_error',
+					error: 'Not authenticated',
+				};
+				ws.send(JSON.stringify(errorMsg));
+				ws.close(4001, 'Not authenticated');
+				return;
+			}
 
 			// Handle different message types
 			switch (clientMsg.type) {
@@ -321,6 +358,66 @@ export class ChatQueue extends DurableObject<Env> {
 					break;
 				}
 			}
+		}
+	}
+
+	/**
+	 * Persist authenticated sessions to storage
+	 */
+	private async persistAuthState(): Promise<void> {
+		const authenticatedSessions = Array.from(this.connections.entries())
+			.filter(([_, conn]) => conn.isAuthenticated)
+			.map(([sessionId, _]) => sessionId);
+
+		await this.ctx.storage.put('authenticatedSessions', authenticatedSessions);
+		console.log(`Persisted ${authenticatedSessions.length} authenticated sessions`);
+	}
+
+	/**
+	 * Validate API key
+	 */
+	private validateApiKey(apiKey: string | undefined): boolean {
+		if (!apiKey) {
+			return false;
+		}
+
+		// Check against environment variables
+		const validKeys = [this.env.WEB_API_KEY, this.env.MOBILE_API_KEY].filter(Boolean);
+
+		return validKeys.includes(apiKey);
+	}
+
+	/**
+	 * Handle authentication
+	 */
+	private async handleAuth(ws: WebSocket, apiKey: string | undefined): Promise<void> {
+		const sessionId = ws.deserializeAttachment() as string;
+		const connection = this.connections.get(sessionId);
+
+		if (!connection) {
+			console.log(`Connection not found for session: ${sessionId}`);
+			ws.close(4000, 'Connection not found');
+			return;
+		}
+
+		if (this.validateApiKey(apiKey)) {
+			// Authentication successful
+			connection.isAuthenticated = true;
+			await this.persistAuthState(); // Persist auth state
+			const successMsg: ServerMessage = {
+				type: 'auth_success',
+			};
+			ws.send(JSON.stringify(successMsg));
+			console.log(`✅ Authentication successful for session: ${sessionId}`);
+		} else {
+			// Authentication failed
+			const errorMsg: ServerMessage = {
+				type: 'auth_error',
+				error: 'Invalid API key',
+			};
+			ws.send(JSON.stringify(errorMsg));
+			ws.close(4001, 'Authentication failed');
+			console.log(`❌ Authentication failed for session: ${sessionId}`);
 		}
 	}
 
@@ -600,6 +697,9 @@ export class ChatQueue extends DurableObject<Env> {
 
 		// Remove from connections and queue
 		this.connections.delete(sessionId);
+
+		// Update authentication state in storage
+		await this.persistAuthState();
 
 		// Update partner relationships in storage (remove this user's relationship)
 		await this.persistPartnerRelationships();

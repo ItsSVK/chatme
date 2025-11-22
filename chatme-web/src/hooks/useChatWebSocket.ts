@@ -154,6 +154,20 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
       console.log('[WebSocket] Received:', data);
 
       switch (data.type) {
+        case 'auth_success':
+          console.log('[WebSocket] ✅ Authentication successful');
+          // Connection is now authenticated, ready to use
+          break;
+
+        case 'auth_error':
+          console.error('[WebSocket] ❌ Authentication failed:', data.error);
+          setConnectionState('error');
+          // Close connection on auth failure
+          if (wsRef.current) {
+            wsRef.current.close(4001, 'Authentication failed');
+          }
+          break;
+
         case 'searching':
           console.log('[WebSocket] Searching for partner...');
           setConnectionState('searching');
@@ -251,7 +265,17 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
         setConnectionState('connected');
         reconnectAttempts.current = 0;
         setupPingInterval();
-        startSearch()
+        
+        // Send API key for authentication
+        if (Config.API_KEY) {
+          console.log('[WebSocket] Sending API key for authentication...');
+          send({ type: 'auth', apiKey: Config.API_KEY });
+        } else {
+          console.warn('[WebSocket] ⚠️ No API key configured');
+        }
+        
+        // Start search after authentication
+        startSearch();
       };
 
       ws.onmessage = handleMessage;
@@ -276,7 +300,8 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
         // Attempt reconnection if not a manual disconnect
         if (
           !isManualDisconnect.current &&
-          reconnectAttempts.current < Config.MAX_RECONNECT_ATTEMPTS
+          reconnectAttempts.current < Config.MAX_RECONNECT_ATTEMPTS &&
+          window.location.pathname === '/chat'
         ) {
           reconnectAttempts.current++;
           console.log(`[WebSocket] 🔄 Reconnect attempt ${reconnectAttempts.current}/${Config.MAX_RECONNECT_ATTEMPTS}`);

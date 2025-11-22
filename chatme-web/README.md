@@ -25,6 +25,10 @@ A modern, aesthetic web version of ChatMe built with React, featuring beautiful 
 # Install dependencies
 npm install
 
+# Configure environment variables
+cp .env.example .env.local
+# Edit .env.local and add your API key
+
 # Run development server
 npm run dev
 
@@ -155,13 +159,29 @@ npm run build
 # Deploy dist/ folder to gh-pages branch
 ```
 
-## 📝 Configuration
+## 🔐 Security Configuration
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+VITE_API_KEY=your-api-key-here
+```
+
+**Important:**
+- Never commit `.env.local` to version control
+- Use different API keys for development and production
+- See `BACKEND_SECURITY.md` for backend implementation
+
+### Configuration
 
 Edit `src/config/index.ts` to change WebSocket URL or other settings:
 
 ```typescript
 export const Config = {
   WEBSOCKET_URL: 'wss://chatme-backend.connectshouvik.workers.dev',
+  API_KEY: import.meta.env.VITE_API_KEY || '',
   RECONNECT_INTERVAL: 3000,
   MAX_RECONNECT_ATTEMPTS: 5,
   PING_INTERVAL: 30000,
