@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, Animated, Easing, StatusBar } from 'react-native';
+import { StyleSheet, View, Animated, Easing, StatusBar, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Theme } from '../constants';
 import { useThemedColors } from '../hooks';
@@ -131,7 +131,12 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
       <AnimatedBackground variant="home" />
 
       {/* Content */}
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
         {/* Logo with animations */}
         <AnimatedLogo variant="home" source={require('../assets/chatme.png')} />
 
@@ -179,7 +184,7 @@ export default function HomeScreen({ onStartChat }: HomeScreenProps) {
           fadeAnim={buttonFadeAnim}
           scaleAnim={buttonScaleAnim}
         />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -197,18 +202,25 @@ const createStyles = (Colors: ReturnType<typeof useThemedColors>) =>
       right: Theme.spacing.md,
       zIndex: 10,
     },
-    content: {
+    scrollView: {
       flex: 1,
+      zIndex: 1,
+    },
+    content: {
+      flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: Theme.spacing.xl,
-      zIndex: 1,
+      paddingTop: Theme.spacing.xxl,
+      paddingBottom: Theme.spacing.xl,
+      minHeight: 0, // Allow content to shrink on small screens
     },
     featuresContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       width: '100%',
-      marginBottom: Theme.spacing.xxl + Theme.spacing.md,
+      marginTop: Theme.spacing.md,
+      marginBottom: Theme.spacing.lg,
       paddingHorizontal: Theme.spacing.sm,
     },
   });

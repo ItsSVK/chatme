@@ -8,6 +8,8 @@ declare namespace Cloudflare {
 	}
 	interface Env {
 		CHAT_QUEUE: DurableObjectNamespace<import("./src/index").ChatQueue>;
+		WEB_API_KEY?: string;
+		MOBILE_API_KEY?: string;
 	}
 }
 interface Env extends Cloudflare.Env {}
