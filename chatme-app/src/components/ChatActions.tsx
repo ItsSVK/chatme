@@ -52,7 +52,8 @@ const createStyles = (Colors: ReturnType<typeof useThemedColors>) => StyleSheet.
   container: {
     flexDirection: 'row',
     paddingHorizontal: Theme.spacing.md,
-    paddingVertical: Theme.spacing.sm,
+    paddingTop: Theme.spacing.sm,
+    paddingBottom: Theme.spacing.lg, // Added bottom padding for better spacing
     borderTopWidth: 1,
     borderTopColor: Colors.glassBorder,
     backgroundColor: Colors.background,

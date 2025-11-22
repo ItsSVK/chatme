@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Config } from '../config';
 import type { ClientMessage, ServerMessage, ConnectionState, Message } from '../types';
+import { logger } from '../utils/logger';
 
 interface UseChatWebSocketReturn {
   connectionState: ConnectionState;
@@ -37,12 +38,12 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       try {
         wsRef.current.send(JSON.stringify(message));
-        console.log('[WebSocket] Sent:', message);
+        logger.debug('[WebSocket] Sent:', message);
       } catch (error) {
-        console.error('[WebSocket] Send error:', error);
+        logger.error('[WebSocket] Send error:', error);
       }
     } else {
-      console.warn('[WebSocket] Cannot send - connection not open');
+      logger.warn('[WebSocket] Cannot send - connection not open');
     }
   }, []);
 
@@ -51,10 +52,10 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
    */
   const startSearch = useCallback(() => {
     if (wsRef.current?.readyState !== WebSocket.OPEN) {
-      console.log('[WebSocket] Waiting for connection to be open');
+      logger.debug('[WebSocket] Waiting for connection to be open');
       return;
     }
-    console.log('[WebSocket] Starting search...');
+    logger.debug('[WebSocket] Starting search...');
     setConnectionState('searching');
     send({ type: 'search' });
   }, [send]);
@@ -102,7 +103,7 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
    * End current chat and search for new partner
    */
   const endChat = useCallback(() => {
-    console.log('[WebSocket] Ending chat...');
+    logger.debug('[WebSocket] Ending chat...');
     setMessages([]);
     setPartnerId(null);
     startSearch();
@@ -116,7 +117,7 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
    * Disconnect from WebSocket
    */
   const disconnect = useCallback(() => {
-    console.log('[WebSocket] Manual disconnect');
+    logger.debug('[WebSocket] Manual disconnect');
     isManualDisconnect.current = true;
 
     // Clear intervals and timeouts
@@ -135,7 +136,7 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
         send({ type: 'end_chat' });
         wsRef.current.close(1000, 'User disconnected');
       } catch (error) {
-        console.error('[WebSocket] Error during disconnect:', error);
+        logger.error('[WebSocket] Error during disconnect:', error);
       }
       wsRef.current = null;
     }
@@ -151,16 +152,16 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
   const handleMessage = useCallback((event: MessageEvent) => {
     try {
       const data: ServerMessage = JSON.parse(event.data);
-      console.log('[WebSocket] Received:', data);
+      logger.debug('[WebSocket] Received:', data);
 
       switch (data.type) {
         case 'auth_success':
-          console.log('[WebSocket] ✅ Authentication successful');
+          logger.success('[WebSocket] ✅ Authentication successful');
           // Connection is now authenticated, ready to use
           break;
 
         case 'auth_error':
-          console.error('[WebSocket] ❌ Authentication failed:', data.error);
+          logger.error('[WebSocket] ❌ Authentication failed:', data.error);
           setConnectionState('error');
           // Close connection on auth failure
           if (wsRef.current) {
@@ -169,12 +170,12 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
           break;
 
         case 'searching':
-          console.log('[WebSocket] Searching for partner...');
+          logger.debug('[WebSocket] Searching for partner...');
           setConnectionState('searching');
           break;
 
         case 'matched':
-          console.log('[WebSocket] Matched with partner:', data.partnerId);
+          logger.info('[WebSocket] Matched with partner:', data.partnerId);
           setConnectionState('matched');
           setPartnerId(data.partnerId || null);
           reconnectAttempts.current = 0;
@@ -194,28 +195,28 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
           break;
 
         case 'partner_disconnected':
-          console.log('[WebSocket] Partner disconnected');
+          logger.info('[WebSocket] Partner disconnected');
           setPartnerId(null);
           setConnectionState('searching');
           setMessages([]);
           break;
 
         case 'pong':
-          console.log('[WebSocket] Pong received');
+          logger.debug('[WebSocket] Pong received');
           break;
 
         case 'chat_ended':
-          console.log('[WebSocket] Chat ended');
+          logger.debug('[WebSocket] Chat ended');
           setMessages([]);
           setPartnerId(null);
           setConnectionState('connected');
           break;
 
         default:
-          console.warn('[WebSocket] Unknown message type:', data);
+          logger.warn('[WebSocket] Unknown message type:', data);
       }
     } catch (error) {
-      console.error('[WebSocket] Error parsing message:', error);
+      logger.error('[WebSocket] Error parsing message:', error);
     }
   }, []);
 
@@ -243,17 +244,17 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
       wsRef.current?.readyState === WebSocket.CONNECTING ||
       wsRef.current?.readyState === WebSocket.OPEN
     ) {
-      console.log('[WebSocket] Already connecting or connected');
+      logger.debug('[WebSocket] Already connecting or connected');
       return;
     }
 
     // Don't reconnect if manually disconnected
     if (isManualDisconnect.current) {
-      console.log('[WebSocket] Manual disconnect, not reconnecting');
+      logger.debug('[WebSocket] Manual disconnect, not reconnecting');
       return;
     }
 
-    console.log('[WebSocket] Connecting to:', Config.WEBSOCKET_URL);
+    logger.info('[WebSocket] Connecting to:', Config.WEBSOCKET_URL);
     setConnectionState('connecting');
 
     try {
@@ -261,17 +262,17 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('[WebSocket] ✅ Connected successfully');
+        logger.success('[WebSocket] ✅ Connected successfully');
         setConnectionState('connected');
         reconnectAttempts.current = 0;
         setupPingInterval();
         
         // Send API key for authentication
         if (Config.API_KEY) {
-          console.log('[WebSocket] Sending API key for authentication...');
+          logger.debug('[WebSocket] Sending API key for authentication...');
           send({ type: 'auth', apiKey: Config.API_KEY });
         } else {
-          console.warn('[WebSocket] ⚠️ No API key configured');
+          logger.warn('[WebSocket] ⚠️ No API key configured');
         }
         
         // Start search after authentication
@@ -281,12 +282,12 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
       ws.onmessage = handleMessage;
 
       ws.onerror = (error) => {
-        console.error('[WebSocket] ❌ Error:', error);
+        logger.error('[WebSocket] ❌ Error:', error);
         setConnectionState('error');
       };
 
       ws.onclose = (event) => {
-        console.log(`[WebSocket] 🔌 Closed: code=${event.code}, reason=${event.reason || 'No reason'}`);
+        logger.debug(`[WebSocket] 🔌 Closed: code=${event.code}, reason=${event.reason || 'No reason'}`);
 
         setConnectionState('disconnected');
         setPartnerId(null);
@@ -304,18 +305,18 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
           window.location.pathname === '/chat'
         ) {
           reconnectAttempts.current++;
-          console.log(`[WebSocket] 🔄 Reconnect attempt ${reconnectAttempts.current}/${Config.MAX_RECONNECT_ATTEMPTS}`);
+          logger.info(`[WebSocket] 🔄 Reconnect attempt ${reconnectAttempts.current}/${Config.MAX_RECONNECT_ATTEMPTS}`);
 
           reconnectTimeoutRef.current = window.setTimeout(() => {
             connect();
           }, Config.RECONNECT_INTERVAL);
         } else if (reconnectAttempts.current >= Config.MAX_RECONNECT_ATTEMPTS) {
-          console.error('[WebSocket] ❌ Max reconnection attempts reached');
+          logger.error('[WebSocket] ❌ Max reconnection attempts reached');
           setConnectionState('error');
         }
       };
     } catch (error) {
-      console.error('[WebSocket] ❌ Connection error:', error);
+      logger.error('[WebSocket] ❌ Connection error:', error);
       setConnectionState('error');
     }
   }, [handleMessage, setupPingInterval]);

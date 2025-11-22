@@ -9,6 +9,7 @@ import { MessageList } from '../../components/chat/MessageList';
 import { ChatInput } from '../../components/chat/ChatInput';
 import { EmojiPicker } from '../../components/chat/EmojiPicker';
 import { ChatActions } from '../../components/chat/ChatActions';
+import { logger } from '../../utils/logger';
 import './ChatScreen.css';
 
 export const ChatScreen: React.FC = () => {
@@ -42,7 +43,7 @@ export const ChatScreen: React.FC = () => {
       : 'Offline';
 
   useEffect(() => {
-    console.log('[ChatScreen] Starting search on mount');
+    logger.debug('[ChatScreen] Starting search on mount');
     startSearch();
   }, [startSearch]);
 
