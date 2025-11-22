@@ -12,7 +12,9 @@ export { ChatQueue };
 const ALLOWED_ORIGINS = [
 	'http://localhost:5173',
 	'http://localhost:3000', // For mobile dev
+	'http://localhost:8787', // React Native sends this when connecting to local backend
 	'https://chatme.itssvk.dev',
+	'https://chatme-backend.connectshouvik.workers.dev',
 ];
 
 /**
@@ -75,9 +77,11 @@ export default {
 
 		const origin = request.headers.get('Origin');
 
-		// Validate origin for WebSocket connections
+		// Validate origin for WebSocket connections from browsers
+		// Note: React Native and native apps don't send Origin header, so we allow null/undefined
+		// Only reject if there IS an origin AND it's not in the allowed list
 		if (request.headers.get('Upgrade') === 'websocket') {
-			if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+			if (origin && origin !== 'null' && !ALLOWED_ORIGINS.includes(origin)) {
 				console.log(`Rejected WebSocket from unauthorized origin: ${origin}`);
 				return new Response('Forbidden - Invalid origin', { status: 403 });
 			}
