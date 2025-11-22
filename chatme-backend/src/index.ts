@@ -11,10 +11,8 @@ export { ChatQueue };
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
 	'http://localhost:5173',
-	'http://localhost:5174',
 	'http://localhost:3000', // For mobile dev
-	// Add your production domains here:
-	// 'https://your-domain.com',
+	'https://chatme.itssvk.dev',
 ];
 
 /**

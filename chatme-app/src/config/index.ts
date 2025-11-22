@@ -1,7 +1,12 @@
 /**
  * App Configuration
  * Centralized configuration for the app
+ * 
+ * Environment variables are loaded from .env file using react-native-config
+ * See .env.example for required variables
  */
+
+import EnvConfig from 'react-native-config';
 
 // WebSocket configuration
 // For local development, use your local Cloudflare Worker URL
@@ -16,24 +21,26 @@
 // - Network IP: Ensure both devices on same Wi-Fi and firewall allows port 8787
 
 export const Config = {
-  // Change this to your Cloudflare Worker WebSocket URL
-  // When running locally with `wrangler dev`, it's typically http://localhost:8787
-  // Make sure to use ws:// for local and wss:// for production
+  // WebSocket URL from environment variables
+  // Fallback to production URL if not set
   WEBSOCKET_URL:
-    __DEV__ && false
-      ? 'ws://localhost:8787' // Local development (set to true when testing locally)
-      : //   ? 'ws://192.168.29.70:8787' // Local development (set to true when testing locally)
-        // ⚠️ For physical device: This may not work! See PHYSICAL_DEVICE_SETUP.md
-        // Options:
-        // 1. Android: Use "adb reverse tcp:8787 tcp:8787" then 'ws://localhost:8787'
-        // 2. iOS: Use ngrok URL (wss://xxx.ngrok.io) or deploy to Cloudflare
-        // 3. Network: Ensure same Wi-Fi, check firewall, verify IP with ifconfig/ipconfig
-        'wss://chatme-backend.connectshouvik.workers.dev', // Production (update with your actual deployed URL)
+    EnvConfig.WEBSOCKET_URL || 'ws://localhost:8787',
 
-  // Reconnection settings
-  RECONNECT_INTERVAL: 3000, // 3 seconds
-  MAX_RECONNECT_ATTEMPTS: 5,
+  // API Key for backend authentication from environment variables
+  // Fallback to development key if not set (NOT RECOMMENDED for production)
+  API_KEY: EnvConfig.API_KEY || 'chatme-mobile-dev-key-2024',
+
+  // Reconnection settings (convert from string to number with fallbacks)
+  RECONNECT_INTERVAL: EnvConfig.RECONNECT_INTERVAL
+    ? parseInt(EnvConfig.RECONNECT_INTERVAL, 10)
+    : 3000, // 3 seconds
+  MAX_RECONNECT_ATTEMPTS: EnvConfig.MAX_RECONNECT_ATTEMPTS
+    ? parseInt(EnvConfig.MAX_RECONNECT_ATTEMPTS, 10)
+    : 5,
 
   // Ping/pong settings for keep-alive
-  PING_INTERVAL: 30000, // 30 seconds
+  PING_INTERVAL: EnvConfig.PING_INTERVAL
+    ? parseInt(EnvConfig.PING_INTERVAL, 10)
+    : 30000, // 30 seconds
 } as const;
+

@@ -3,6 +3,7 @@
  * These types match the backend protocol defined in chatme-backend/src/types.ts
  */
 
+type AUTH = 'auth';
 type SEARCH = 'search';
 type MESSAGE = 'message';
 type END_CHAT = 'end_chat';
@@ -11,6 +12,8 @@ type SESSION_ID = 'session_id';
 type PARTNER_DISCONNECTED = 'partner_disconnected';
 type PONG = 'pong';
 type CHAT_ENDED = 'chat_ended';
+type AUTH_SUCCESS = 'auth_success';
+type AUTH_ERROR = 'auth_error';
 
 type DISCONNECTED = 'disconnected';
 type CONNECTING = 'connecting';
@@ -21,13 +24,19 @@ type ERROR = 'error';
 
 // Client → Server message types
 export interface ClientMessage {
-  type: SEARCH | MESSAGE | END_CHAT | PING;
+  type: AUTH | SEARCH | MESSAGE | END_CHAT | PING;
+  apiKey?: string; // For auth type
   text?: string; // For text message type
   imageUrl?: string; // For GIF/sticker message type
 }
 
 export interface SearchMessage extends ClientMessage {
   type: SEARCH;
+}
+
+export interface AuthMessage extends ClientMessage {
+  type: AUTH;
+  apiKey: string;
 }
 
 export interface ChatMessage extends ClientMessage {
@@ -47,6 +56,8 @@ export interface PingMessage extends ClientMessage {
 // Server → Client message types
 export interface ServerMessage {
   type:
+    | AUTH_SUCCESS
+    | AUTH_ERROR
     | SESSION_ID
     | MATCHED
     | SEARCHING
@@ -59,11 +70,21 @@ export interface ServerMessage {
   text?: string; // For text message type
   imageUrl?: string; // For GIF/sticker message type
   from?: string; // For message type
+  error?: string; // For auth_error type
 }
 
 export interface SessionIdMessage extends ServerMessage {
   type: SESSION_ID;
   sessionId: string;
+}
+
+export interface AuthSuccessMessage extends ServerMessage {
+  type: AUTH_SUCCESS;
+}
+
+export interface AuthErrorMessage extends ServerMessage {
+  type: AUTH_ERROR;
+  error: string;
 }
 
 export interface MatchedMessage extends ServerMessage {
