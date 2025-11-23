@@ -193,18 +193,13 @@ graph LR
 - [x] Secure WebSocket communication
 
 ### Phase 2 - Enhancements
-- [ ] Image/GIF sharing
+- [x] Image/GIF sharing
 - [ ] Typing indicators
-- [ ] Read receipts
-- [ ] Interest-based matching
-- [ ] Message timestamps
 
 ### Phase 3 - Advanced
 - [ ] Voice messages
 - [ ] Video chat support
-- [ ] Group chats
-- [ ] Chat history (optional, encrypted)
-- [ ] Multi-language support
+- [ ] End-to-end encrypted chat
 
 ---
 
