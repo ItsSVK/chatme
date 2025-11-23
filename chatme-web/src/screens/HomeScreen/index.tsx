@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AnimatedBackground } from '../../components/common/AnimatedBackground';
 import { ThemeToggle } from '../../components/common/ThemeToggle';
 import { FeatureCard } from '../../components/common/FeatureCard';
+import { MobileAppPromo } from '../../components/common/MobileAppPromo';
+import { Footer } from '../../components/common/Footer';
 import './HomeScreen.css';
 
 export const HomeScreen: React.FC = () => {
@@ -85,7 +87,6 @@ export const HomeScreen: React.FC = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 1 }}
-          whileHover={{ scale: 1.05, boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)' }}
           whileTap={{ scale: 0.95 }}
         >
           Start Chatting
@@ -94,7 +95,14 @@ export const HomeScreen: React.FC = () => {
             <polyline points="12 5 19 12 12 19" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </motion.button>
+
+        {/* Mobile App Promo */}
+        <div>
+        <MobileAppPromo githubReleaseUrl="https://github.com/ItsSVK/chatme/releases/download/v1.0.0/app-release.apk" />
+        </div>
       </div>
+
+      <Footer />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useChatWebSocket } from '../../hooks/useChatWebSocket';
 import { AnimatedBackground } from '../../components/common/AnimatedBackground';
 import { ThemeToggle } from '../../components/common/ThemeToggle';
+import { Footer } from '../../components/common/Footer';
 import { ChatHeader } from '../../components/chat/ChatHeader';
 import { MessageList } from '../../components/chat/MessageList';
 import { ChatInput } from '../../components/chat/ChatInput';
@@ -114,6 +115,8 @@ export const ChatScreen: React.FC = () => {
           connectionState={connectionState}
         />
       </motion.div>
+
+      <Footer />
     </div>
   );
 };

@@ -9,6 +9,8 @@ export { MessageList } from './chat/MessageList';
 // Common Components
 export { AnimatedBackground } from './common/AnimatedBackground';
 export { FeatureCard } from './common/FeatureCard';
+export { Footer } from './common/Footer';
 export { LoadingIndicator } from './common/LoadingIndicator';
+export { MobileAppPromo } from './common/MobileAppPromo';
 export { ProtectedRoute } from './common/ProtectedRoute';
 export { ThemeToggle } from './common/ThemeToggle';

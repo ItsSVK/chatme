@@ -11,6 +11,11 @@
   border-style: solid;
 }
 
+.feature-card:hover .feature-title,
+.feature-card:hover .feature-description {
+  color: var(--text-primary);
+}
+
 .feature-icon {
   width: 60px;
   height: 60px;
@@ -26,7 +31,7 @@
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .feature-description {

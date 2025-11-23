@@ -97,6 +97,15 @@
 }
 
 @media (max-width: 768px) {
+  .home-screen {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
   .theme-toggle-container {
     top: 1rem;
     right: 1rem;
@@ -104,6 +113,7 @@
   
   .home-content {
     padding: 1rem;
+    padding-bottom: 2rem;
   }
   
   .logo {
