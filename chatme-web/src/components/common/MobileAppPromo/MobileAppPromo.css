@@ -1,7 +1,8 @@
 .mobile-app-promo {
   width: 100%;
   max-width: 500px;
-  margin: 2.5rem auto 0;
+  margin: clamp(1.5rem, 2.5vw, 2rem) auto 0;
+  margin-bottom: clamp(1.5rem, 2.5vw, 2rem);
   padding: 0 1rem;
 }
 
@@ -9,19 +10,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* gap: 0.25rem; */
+  gap: 1rem;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 1.25rem;
-  padding: 1.5rem 2rem;
+  border-radius: clamp(0.9rem, 1.3vw, 1.1rem);
+  padding: clamp(1.1rem, 1.8vw, 1.35rem) clamp(1.35rem, 2.2vw, 1.75rem);
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  max-width: 400px;
-  min-width: 350px;
+  max-width: clamp(300px, 36vw, 380px);
+  min-width: min(280px, 88vw);
+  max-height: clamp(60px, 8vw, 80px);
 }
 
 .promo-card::before {
@@ -38,12 +40,6 @@
     transform: scale(1.1);
   }
 }
-
-/* .promo-card:hover { */
-  /* box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); */
-  /* border-color: var(--border-color); */
-  /* transform: translateY(-2px); */
-/* } */
 
 .promo-content {
   display: flex;
@@ -85,10 +81,10 @@
 }
 
 .promo-title {
-  font-size: 1.125rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
   font-weight: 600;
   color: var(--text-secondary);
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.2rem 0;
   line-height: 1.3;
 }
 
@@ -119,18 +115,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: clamp(35px, 4.6vw, 40px);
+  height: clamp(35px, 4.6vw, 40px);
   background: var(--glass-bg);
   border: 1px solid var(--border-color);
   border-radius: 50%;
   color: var(--text-primary);
-  font-size: 1.125rem;
-  transition: all 0.3s ease;
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   overflow: hidden;
   z-index: 1;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .download-btn::before {
@@ -141,13 +137,14 @@
   border-radius: 50%;
   opacity: 0;
   transform: scale(0);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: -1;
 }
 
 .download-btn svg {
   position: relative;
   z-index: 1;
+  /* Smooth bouncy animation for icon changes */
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   color: var(--text-secondary);
 }
@@ -159,20 +156,19 @@
 .download-btn:hover {
   border-color: var(--text-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 .download-btn:active {
   transform: translateY(0) scale(0.95);
 }
 
-/* Click Animation State */
+/* Click Animation State - Keep same size, only change colors */
 .download-btn.downloading {
-  border-color: transparent;
-  width: 44px;
-  height: 44px;
+  border-color: var(--text-primary);
   background: var(--text-primary);
-  transform: scale(1.1);
+  /* Remove size changes - keep button uniform */
+  transform: none;
 }
 
 .download-btn.downloading::before {
@@ -193,37 +189,36 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: clamp(35px, 4.6vw, 40px);
+  height: clamp(35px, 4.6vw, 40px);
   background: var(--glass-bg);
   border: 1px solid var(--border-color);
   border-radius: 50%;
   color: var(--text-secondary);
-  font-size: 1.25rem;
+  font-size: clamp(1.05rem, 1.8vw, 1.15rem);
   transition: all 0.3s ease;
   text-decoration: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-lg);
 }
 
 .github-link:hover {
   background: var(--bg-secondary);
   color: var(--text-primary);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   border-color: var(--text-primary);
 }
 
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   .mobile-app-promo {
-    margin: 4rem auto 4rem;
+    margin: 3rem auto 3rem;
   }
 
-  .promo-card {
+  /* .promo-card {
     flex-direction: column;
     align-items: stretch;
-    gap: 1.25rem;
-    padding: 1.5rem;
+    gap: clamp(1rem, 2vw, 1.25rem);
   }
 
   .promo-content {
@@ -232,37 +227,9 @@
     text-align: center;
   }
 
-  .android-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .promo-title {
-    font-size: 1rem;
-  }
-
-  .android-badge {
-    font-size: 0.6875rem;
-  }
-
   .promo-actions {
     width: 100%;
     justify-content: center;
-  }
-
-  .download-btn {
-    width: 44px;
-    height: 44px;
-  }
-
-  .download-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .github-link {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-  }
+  } */
 }
+

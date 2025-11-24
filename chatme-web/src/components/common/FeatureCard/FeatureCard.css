@@ -1,9 +1,9 @@
 .feature-card {
   flex: 1;
-  min-width: 200px;
-  max-width: 280px;
-  padding: 1.5rem;
-  border-radius: 16px;
+  min-width: clamp(140px, 18vw, 180px);
+  max-width: clamp(220px, 25vw, 260px);
+  padding: clamp(1.1rem, 1.8vw, 1.35rem);
+  border-radius: clamp(11px, 1.3vw, 14px);
   text-align: center;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -17,33 +17,26 @@
 }
 
 .feature-icon {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 1rem;
+  width: clamp(44px, 5.5vw, 56px);
+  height: clamp(44px, 5.5vw, 56px);
+  margin: 0 auto clamp(0.65rem, 1.3vw, 0.9rem);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
+  font-size: clamp(1.4rem, 2vw, 1.65rem);
 }
 
 .feature-title {
-  font-size: 1.125rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.45rem;
   color: var(--text-secondary);
 }
 
 .feature-description {
-  font-size: 0.875rem;
+  font-size: clamp(0.78rem, 1.3vw, 0.84rem);
   color: var(--text-secondary);
   margin: 0;
 }
 
-@media (max-width: 768px) {
-  .feature-card {
-    min-width: 150px;
-    max-width: 240px;
-    padding: 1.25rem;
-  }
-}

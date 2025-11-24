@@ -5,7 +5,7 @@
   right: 0;
   padding: 1rem;
   text-align: center;
-  z-index: 100;
+  z-index: 50;
   pointer-events: none;
 }
 
@@ -36,11 +36,6 @@
   letter-spacing: 0.02em;
 }
 
-.footer-heart {
-  font-size: 1rem;
-  animation: heartbeat 1.5s ease-in-out infinite;
-}
-
 .footer-author {
   font-weight: 600;
   background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
@@ -54,26 +49,19 @@
     opacity: 0.8;
 }
 
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
 /* Mobile Optimizations */
-@media (max-width: 768px) {
+@media (max-width: 1440px) {
   .footer {
-    padding: 0.75rem;
+    padding: 0.5rem;
+    z-index: 5;
   }
 
   .footer-content {
-    padding: 0.625rem 1.25rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
   }
 
   .footer-text {
-    font-size: 0.8125rem;
-  }
-
-  .footer-heart {
-    font-size: 0.9375rem;
+    font-size: 0.75rem;
   }
 }

@@ -26,10 +26,25 @@
 }
 
 @media (max-width: 768px) {
+  .chat-screen {
+    /* Allow scrolling on mobile if needed */
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Use dvh for better mobile browser support */
+    min-height: 100dvh;
+  }
+
   .chat-container {
-    height: 100vh;
-    max-height: 100vh;
-    padding: 1rem;
+    /* Use dvh (dynamic viewport height) for mobile browsers */
+    height: 100dvh;
+    max-height: 100dvh;
+    padding: 0.75rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Hide footer on mobile chat screen to prevent UX interference */
+  .chat-screen .footer {
+    display: none;
   }
 }
 

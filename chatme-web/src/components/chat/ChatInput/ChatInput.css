@@ -80,6 +80,8 @@
 @media (max-width: 768px) {
   .chat-input-container {
     padding: 0.75rem 1rem;
+    /* Add bottom margin to prevent footer overlap */
+    margin-bottom: 3rem;
   }
   
   .chat-input {

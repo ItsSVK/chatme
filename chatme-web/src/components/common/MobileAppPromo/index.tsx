@@ -23,7 +23,8 @@ export const MobileAppPromo: React.FC = () => {
         <div className="promo-content">
           <div className="promo-text">
             <h3 className="promo-title">
-              Get it on Android</h3>
+              Get it on Android
+            </h3>
           </div>
         </div>
         <div className="promo-actions">
