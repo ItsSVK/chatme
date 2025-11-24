@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
     >
       <div className="footer-content">
         <span className="footer-text">Crafted with care by</span>
-        <span className="footer-author" onClick={() => window.open('https://github.com/ItsSVK', '_blank')}>Shouvik Mohanta</span>
+        <span className="footer-author" onClick={() => window.open('https://twitter.com/ShouvikMohanta', '_blank')}>Shouvik Mohanta</span>
       </div>
     </motion.footer>
   );

@@ -98,7 +98,7 @@ export const HomeScreen: React.FC = () => {
 
         {/* Mobile App Promo */}
         <div>
-        <MobileAppPromo githubReleaseUrl="https://github.com/ItsSVK/chatme/releases/download/v1.0.0/app-release.apk" />
+        <MobileAppPromo/>
         </div>
       </div>
 

@@ -2,13 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import './MobileAppPromo.css';
 
-interface MobileAppPromoProps {
-  githubReleaseUrl?: string;
-}
-
-export const MobileAppPromo: React.FC<MobileAppPromoProps> = ({
-  githubReleaseUrl = 'https://github.com/ItsSVK/chatme/releases',
-}) => {
+export const MobileAppPromo: React.FC = () => {
   const [isDownloading, setIsDownloading] = React.useState(false);
 
   const handleDownload = async () => {
@@ -34,7 +28,8 @@ export const MobileAppPromo: React.FC<MobileAppPromoProps> = ({
         </div>
         <div className="promo-actions">
           <a
-            href={githubReleaseUrl}
+            // https://github.com/ItsSVK/chatme/releases/download/v1.0.0/app-release.apk
+            href="/chatme.apk"
             rel="noopener noreferrer"
             className={`download-btn ${isDownloading ? 'downloading' : ''}`}
             title="Download APK"

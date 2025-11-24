@@ -193,7 +193,7 @@ graph LR
 - [x] Secure WebSocket communication
 
 ### Phase 2 - Enhancements
-- [x] Image/GIF sharing
+- [x] Image/GIF sharing (Android app exclusive)
 - [ ] Typing indicators
 
 ### Phase 3 - Advanced
