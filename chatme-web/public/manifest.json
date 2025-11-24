@@ -1,0 +1,21 @@
+{
+  "name": "ChatMe - Anonymous Random Chat",
+  "short_name": "ChatMe",
+  "description": "Free anonymous random chat app. Connect instantly with strangers worldwide.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/chatme-transparent.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "communication"],
+  "lang": "en",
+  "dir": "ltr"
+}
