@@ -7,6 +7,8 @@ type SEARCH = 'search';
 type MESSAGE = 'message';
 type END_CHAT = 'end_chat';
 type PING = 'ping';
+type TYPING_START = 'typing_start';
+type TYPING_STOP = 'typing_stop';
 type SESSION_ID = 'session_id';
 type PARTNER_DISCONNECTED = 'partner_disconnected';
 type PONG = 'pong';
@@ -23,7 +25,7 @@ type ERROR = 'error';
 
 // Client → Server message types
 export interface ClientMessage {
-	type: AUTH | SEARCH | MESSAGE | END_CHAT | PING;
+	type: AUTH | SEARCH | MESSAGE | END_CHAT | PING | TYPING_START | TYPING_STOP;
 	apiKey?: string; // For auth type
 	text?: string; // For text message type
 	imageUrl?: string; // For GIF/sticker message type
@@ -52,9 +54,17 @@ export interface PingMessage extends ClientMessage {
 	type: PING;
 }
 
+export interface TypingStartMessage extends ClientMessage {
+	type: TYPING_START;
+}
+
+export interface TypingStopMessage extends ClientMessage {
+	type: TYPING_STOP;
+}
+
 // Server → Client message types
 export interface ServerMessage {
-	type: AUTH_SUCCESS | AUTH_ERROR | SESSION_ID | MATCHED | SEARCHING | MESSAGE | PARTNER_DISCONNECTED | PONG | CHAT_ENDED;
+	type: AUTH_SUCCESS | AUTH_ERROR | SESSION_ID | MATCHED | SEARCHING | MESSAGE | PARTNER_DISCONNECTED | PONG | CHAT_ENDED | TYPING_START | TYPING_STOP;
 	sessionId?: string; // For session_id type
 	partnerId?: string; // For matched type
 	text?: string; // For text message type
@@ -103,4 +113,12 @@ export interface PongMessage extends ServerMessage {
 
 export interface ChatEndedMessage extends ServerMessage {
 	type: CHAT_ENDED;
+}
+
+export interface ServerTypingStartMessage extends ServerMessage {
+	type: TYPING_START;
+}
+
+export interface ServerTypingStopMessage extends ServerMessage {
+	type: TYPING_STOP;
 }

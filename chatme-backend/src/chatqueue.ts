@@ -9,6 +9,8 @@ import type {
 	PartnerDisconnectedMessage,
 	PongMessage,
 	ChatEndedMessage,
+	ServerTypingStartMessage,
+	ServerTypingStopMessage,
 } from './types';
 
 /**
@@ -297,6 +299,12 @@ export class ChatQueue extends DurableObject<Env> {
 				case 'ping':
 					await this.handlePing(ws);
 					break;
+				case 'typing_start':
+					await this.handleTypingStart(ws);
+					break;
+				case 'typing_stop':
+					await this.handleTypingStop(ws);
+					break;
 				default:
 					console.warn('Unknown message type:', clientMsg);
 			}
@@ -556,6 +564,62 @@ export class ChatQueue extends DurableObject<Env> {
 			type: 'pong',
 		};
 		ws.send(JSON.stringify(msg));
+	}
+
+	/**
+	 * Handle typing start event
+	 */
+	private async handleTypingStart(ws: WebSocket): Promise<void> {
+		const sessionId = ws.deserializeAttachment() as string;
+		const connection = this.connections.get(sessionId);
+
+		if (!connection || !connection.currentPartnerId) {
+			return; // Not connected to anyone, ignore
+		}
+
+		const partnerConnection = this.connections.get(connection.currentPartnerId);
+		if (!partnerConnection) {
+			return; // Partner disconnected
+		}
+
+		// Forward typing start event to partner
+		const msg: ServerTypingStartMessage = {
+			type: 'typing_start',
+		};
+
+		try {
+			partnerConnection.ws.send(JSON.stringify(msg));
+		} catch (error) {
+			console.error('Error sending typing start to partner:', error);
+		}
+	}
+
+	/**
+	 * Handle typing stop event
+	 */
+	private async handleTypingStop(ws: WebSocket): Promise<void> {
+		const sessionId = ws.deserializeAttachment() as string;
+		const connection = this.connections.get(sessionId);
+
+		if (!connection || !connection.currentPartnerId) {
+			return; // Not connected to anyone, ignore
+		}
+
+		const partnerConnection = this.connections.get(connection.currentPartnerId);
+		if (!partnerConnection) {
+			return; // Partner disconnected
+		}
+
+		// Forward typing stop event to partner
+		const msg: ServerTypingStopMessage = {
+			type: 'typing_stop',
+		};
+
+		try {
+			partnerConnection.ws.send(JSON.stringify(msg));
+		} catch (error) {
+			console.error('Error sending typing stop to partner:', error);
+		}
 	}
 
 	/**

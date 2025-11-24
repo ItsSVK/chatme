@@ -27,6 +27,8 @@ export const ChatScreen: React.FC = () => {
     partnerId,
     disconnect,
     clearMessages,
+    isPartnerTyping,
+    notifyTyping,
   } = useChatWebSocket();
 
   const isConnecting = connectionState === 'connecting' || connectionState === 'searching';
@@ -38,7 +40,9 @@ export const ChatScreen: React.FC = () => {
     connectionState === 'searching'
       ? 'Finding a stranger...'
       : connectionState === 'matched'
-      ? 'Online'
+      ? isPartnerTyping
+        ? 'typing...'
+        : 'Online'
       : connectionState === 'connecting'
       ? 'Connecting...'
       : 'Offline';
@@ -92,7 +96,11 @@ export const ChatScreen: React.FC = () => {
       >
         <ChatHeader contactName={contactName} contactStatus={contactStatus} />
         
-        <MessageList messages={messages} isConnecting={isConnecting} />
+        <MessageList 
+          messages={messages} 
+          isConnecting={isConnecting}
+          isPartnerTyping={isPartnerTyping}
+        />
         
         <div className="input-section">
           <EmojiPicker
@@ -106,6 +114,7 @@ export const ChatScreen: React.FC = () => {
             onSend={handleSend}
             onToggleEmojiPicker={() => setShowEmojiPicker(!showEmojiPicker)}
             connectionState={connectionState}
+            onTyping={notifyTyping}
           />
         </div>
         

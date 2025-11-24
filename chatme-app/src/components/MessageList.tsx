@@ -11,17 +11,20 @@ import type { Message } from '../types';
 import { formatDate, shouldShowDate, shouldShowTimestamp } from '../utils';
 import MessageBubble from './MessageBubble';
 import LoadingDots from './LoadingDots';
+import TypingIndicator from './TypingIndicator';
 
 interface MessageListProps {
   messages: Message[];
   isConnecting: boolean;
   scrollViewRef: RefObject<ScrollView>;
+  isPartnerTyping?: boolean;
 }
 
 export default function MessageList({
   messages,
   isConnecting,
   scrollViewRef,
+  isPartnerTyping,
 }: MessageListProps) {
   const Colors = useThemedColors();
   const dynamicStyles = createStyles(Colors);
@@ -65,24 +68,27 @@ export default function MessageList({
           )}
         </View>
       ) : (
-        messages.map((msg, index) => {
-          const previousMsg = index > 0 ? messages[index - 1] : null;
-          const nextMsg =
-            index < messages.length - 1 ? messages[index + 1] : null;
-          const showDate = shouldShowDate(msg, previousMsg);
-          const showTimestamp = shouldShowTimestamp(msg, nextMsg);
-          const dateText = showDate ? formatDate(msg.timestamp) : null;
+        <>
+          {messages.map((msg, index) => {
+            const previousMsg = index > 0 ? messages[index - 1] : null;
+            const nextMsg =
+              index < messages.length - 1 ? messages[index + 1] : null;
+            const showDate = shouldShowDate(msg, previousMsg);
+            const showTimestamp = shouldShowTimestamp(msg, nextMsg);
+            const dateText = showDate ? formatDate(msg.timestamp) : null;
 
-          return (
-            <MessageBubble
-              key={msg.id}
-              message={msg}
-              showTimestamp={showTimestamp}
-              showDate={showDate}
-              dateText={dateText}
-            />
-          );
-        })
+            return (
+              <MessageBubble
+                key={msg.id}
+                message={msg}
+                showTimestamp={showTimestamp}
+                showDate={showDate}
+                dateText={dateText}
+              />
+            );
+          })}
+          {isPartnerTyping && <TypingIndicator />}
+        </>
       )}
     </ScrollView>
   );

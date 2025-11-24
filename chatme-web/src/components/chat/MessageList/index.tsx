@@ -2,21 +2,23 @@ import { useEffect, useRef } from 'react';
 import type { Message } from '../../../types';
 import { MessageBubble } from '../MessageBubble';
 import { LoadingIndicator } from '../../common/LoadingIndicator';
+import { TypingIndicator } from '../TypingIndicator';
 import './MessageList.css';
 
 interface MessageListProps {
   messages: Message[];
   isConnecting: boolean;
+  isPartnerTyping?: boolean;
 }
 
-export const MessageList: React.FC<MessageListProps> = ({ messages, isConnecting }) => {
+export const MessageList: React.FC<MessageListProps> = ({ messages, isConnecting, isPartnerTyping }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isPartnerTyping]);
 
   return (
     <div className="message-list" ref={scrollRef}>
@@ -33,6 +35,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isConnecting
           {messages.map((message, index) => (
             <MessageBubble key={message.id} message={message} index={index} />
           ))}
+          {isPartnerTyping && <TypingIndicator />}
         </div>
       )}
     </div>

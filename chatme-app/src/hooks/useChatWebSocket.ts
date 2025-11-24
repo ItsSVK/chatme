@@ -24,6 +24,8 @@ interface UseChatWebSocketReturn {
   clearMessages: () => void;
   partnerId: string | null;
   disconnect: () => void;
+  isPartnerTyping: boolean;
+  notifyTyping: () => void;
 }
 
 export function useChatWebSocket(): UseChatWebSocketReturn {
@@ -39,6 +41,10 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
   );
   const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isManualDisconnect = useRef(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTyping = useRef(false);
+
+  const [isPartnerTyping, setIsPartnerTyping] = useState(false);
 
   /**
    * Send a message through WebSocket
@@ -123,6 +129,34 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
   );
 
   /**
+   * Notify partner that user is typing
+   * Throttled to prevent spam - sends typing_start on first call,
+   * then typing_stop after 2 seconds of inactivity
+   */
+  const notifyTyping = useCallback(() => {
+    if (connectionState !== 'matched') return;
+
+    // Send typing_start if not already typing
+    if (!isTyping.current) {
+      isTyping.current = true;
+      send({ type: 'typing_start' });
+      console.log('[WebSocket] Sent typing_start');
+    }
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set timeout to send typing_stop after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      isTyping.current = false;
+      send({ type: 'typing_stop' });
+      console.log('[WebSocket] Sent typing_stop');
+    }, 2000);
+  }, [connectionState, send]);
+
+  /**
    * End current chat and search for new partner
    */
   const endChat = useCallback(() => {
@@ -152,6 +186,10 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
 
     // Close WebSocket
     if (wsRef.current) {
@@ -167,6 +205,8 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
     setConnectionState('disconnected');
     setMessages([]);
     setPartnerId(null);
+    setIsPartnerTyping(false);
+    isTyping.current = false;
   }, [send]);
 
   /**
@@ -234,6 +274,16 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
           clearMessages();
           setPartnerId(null);
           setConnectionState('connected');
+          break;
+
+        case 'typing_start':
+          console.log('[WebSocket] Partner started typing');
+          setIsPartnerTyping(true);
+          break;
+
+        case 'typing_stop':
+          console.log('[WebSocket] Partner stopped typing');
+          setIsPartnerTyping(false);
           break;
 
         default:
@@ -470,5 +520,7 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
     endChat,
     partnerId,
     disconnect,
+    isPartnerTyping,
+    notifyTyping,
   };
 }

@@ -32,6 +32,7 @@ interface ChatInputProps {
   connectionState: ConnectionState;
   isConnecting: boolean;
   inputScaleAnim: Animated.Value;
+  onTyping?: () => void;
 }
 
 export default function ChatInput({
@@ -44,6 +45,7 @@ export default function ChatInput({
   connectionState,
   isConnecting,
   inputScaleAnim,
+  onTyping,
 }: ChatInputProps) {
   const Colors = useThemedColors();
   const dynamicStyles = createStyles(Colors);
@@ -91,6 +93,11 @@ export default function ChatInput({
 
     // Otherwise, update text normally
     onChangeText(text);
+    
+    // Notify partner that user is typing
+    if (onTyping && connectionState === 'matched' && text.trim()) {
+      onTyping();
+    }
   };
 
   // Handle manual image selection button (📎 button)

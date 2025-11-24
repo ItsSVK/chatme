@@ -52,6 +52,8 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
     partnerId,
     disconnect,
     clearMessages,
+    isPartnerTyping,
+    notifyTyping,
   } = useChatWebSocket();
 
   // Determine if we're connecting/searching
@@ -66,7 +68,9 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
     connectionState === 'searching'
       ? 'Finding a stranger...'
       : connectionState === 'matched'
-      ? 'Online'
+      ? isPartnerTyping
+        ? 'typing...'
+        : 'Online'
       : connectionState === 'connecting'
       ? 'Connecting...'
       : 'Offline';
@@ -276,6 +280,7 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
             messages={messages}
             isConnecting={isConnecting}
             scrollViewRef={scrollViewRef as React.RefObject<ScrollView>}
+            isPartnerTyping={isPartnerTyping}
           />
 
           {/* Emoji Picker */}
@@ -296,6 +301,7 @@ export default function ChatScreen({ onEndChat, onNextChat }: ChatScreenProps) {
             connectionState={connectionState}
             isConnecting={isConnecting}
             inputScaleAnim={inputScaleAnim}
+            onTyping={notifyTyping}
           />
 
           {/* Action buttons at bottom - hide when keyboard is visible */}

@@ -8,6 +8,7 @@ interface ChatInputProps {
   onSend: () => void;
   onToggleEmojiPicker: () => void;
   connectionState: ConnectionState;
+  onTyping?: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -16,6 +17,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onSend,
   onToggleEmojiPicker,
   connectionState,
+  onTyping,
 }) => {
   const canSend = connectionState === 'matched' && message.trim().length > 0;
 
@@ -25,6 +27,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       if (canSend) {
         onSend();
       }
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeText(e.target.value);
+    // Notify partner that user is typing
+    if (onTyping && connectionState === 'matched') {
+      onTyping();
     }
   };
 
@@ -44,7 +54,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         className="chat-input"
         placeholder={connectionState === 'matched' ? 'Type a message...' : 'Waiting for connection...'}
         value={message}
-        onChange={(e) => onChangeText(e.target.value)}
+        onChange={handleChange}
         onKeyPress={handleKeyPress}
         disabled={connectionState !== 'matched'}
       />
